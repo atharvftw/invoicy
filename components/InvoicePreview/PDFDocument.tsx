@@ -310,6 +310,7 @@ export default function PDFDocument({ invoice, qrDataUrl }: Props) {
           {/* Logo or empty space */}
           <View>
             {invoice.logo ? (
+              {/* eslint-disable-next-line jsx-a11y/alt-text */}
               <Image src={invoice.logo} style={styles.logo} />
             ) : (
               <View style={styles.logoPlaceholder} />
@@ -460,6 +461,7 @@ export default function PDFDocument({ invoice, qrDataUrl }: Props) {
 
             {invoice.payment_qr && qrDataUrl ? (
               <View style={styles.qrBlock}>
+                {/* eslint-disable-next-line jsx-a11y/alt-text */}
                 <Image src={qrDataUrl} style={styles.qrImage} />
                 <Text style={styles.qrLabel}>Scan to pay</Text>
               </View>

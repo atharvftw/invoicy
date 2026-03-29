@@ -29,11 +29,9 @@ export default function PDFDownloadButton({ invoice }: Props) {
       const { default: PDFDocument } = await import("./PDFDocument");
       const { createElement } = await import("react");
 
-      // Cast to any to satisfy @react-pdf/renderer's strict typing
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const doc = createElement(PDFDocument as any, { invoice, qrDataUrl });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const blob = await pdf(doc as any).toBlob();
+      // Cast to satisfy @react-pdf/renderer's strict DocumentProps typing
+      const doc = createElement(PDFDocument as any, { invoice, qrDataUrl }); // eslint-disable-line
+      const blob = await pdf(doc as any).toBlob(); // eslint-disable-line
 
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
