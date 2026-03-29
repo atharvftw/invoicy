@@ -22,6 +22,9 @@ interface InvoiceStore {
   markAsPaid: (id: string) => void;
   updateStatus: (id: string, status: Invoice["status"]) => void;
   getNextInvoiceNumber: () => string;
+  // DB sync
+  fetchFromServer: () => Promise<void>;
+  pushToServer: (invoice: Invoice) => void;
 }
 
 export const useInvoiceStore = create<InvoiceStore>()(
@@ -50,15 +53,41 @@ export const useInvoiceStore = create<InvoiceStore>()(
         const now = new Date().toISOString();
         const existing = invoices.findIndex((inv) => inv.id === calculated.id);
 
+        let saved: Invoice;
         if (existing >= 0) {
           const updated = [...invoices];
-          updated[existing] = { ...calculated, updated_at: now };
-          set({ invoices: updated, currentInvoice: { ...calculated, updated_at: now } });
+          saved = { ...calculated, updated_at: now };
+          updated[existing] = saved;
+          set({ invoices: updated, currentInvoice: saved });
         } else {
-          const newInv = { ...calculated, created_at: now, updated_at: now };
-          set({ invoices: [...invoices, newInv], currentInvoice: newInv });
+          saved = { ...calculated, created_at: now, updated_at: now };
+          set({ invoices: [...invoices, saved], currentInvoice: saved });
         }
+
+        // Fire-and-forget sync to Turso
+        get().pushToServer(saved);
         return calculated.id;
+      },
+
+      pushToServer: (invoice) => {
+        fetch("/api/invoices", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(invoice),
+        }).catch(() => {});
+      },
+
+      fetchFromServer: async () => {
+        try {
+          const res = await fetch("/api/invoices");
+          if (!res.ok) return;
+          const invoices: Invoice[] = await res.json();
+          if (invoices.length > 0) {
+            set({ invoices });
+          }
+        } catch {
+          // offline — keep localStorage data
+        }
       },
 
       loadInvoice: (id) => {
@@ -75,6 +104,7 @@ export const useInvoiceStore = create<InvoiceStore>()(
 
       deleteInvoice: (id) => {
         set({ invoices: get().invoices.filter((i) => i.id !== id) });
+        fetch(`/api/invoices/${id}`, { method: "DELETE" }).catch(() => {});
       },
 
       duplicateInvoice: (id) => {
@@ -91,7 +121,9 @@ export const useInvoiceStore = create<InvoiceStore>()(
           updated_at: now,
           items: inv.items.map((item) => ({ ...item, id: uuidv4() })),
         };
-        set({ invoices: [...get().invoices, duplicate] });
+        const updated = [...get().invoices, duplicate];
+        set({ invoices: updated });
+        get().pushToServer(duplicate);
         return newId;
       },
 
@@ -108,6 +140,8 @@ export const useInvoiceStore = create<InvoiceStore>()(
             : inv
         );
         set({ invoices: updated });
+        const paid = updated.find((i) => i.id === id);
+        if (paid) get().pushToServer(paid);
       },
 
       updateStatus: (id, status) => {
@@ -115,6 +149,8 @@ export const useInvoiceStore = create<InvoiceStore>()(
           inv.id === id ? { ...inv, status, updated_at: new Date().toISOString() } : inv
         );
         set({ invoices: updated });
+        const changed = updated.find((i) => i.id === id);
+        if (changed) get().pushToServer(changed);
       },
 
       getNextInvoiceNumber: () => {

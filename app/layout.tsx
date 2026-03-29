@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Sidebar from "@/components/UI/Sidebar";
+import SyncProvider from "@/components/UI/SyncProvider";
 import { ClerkProvider } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
@@ -17,12 +18,14 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className="grain">
-          <div className="flex h-screen overflow-hidden">
-            <Sidebar />
-            <main className="flex-1 overflow-y-auto min-w-0">
-              {children}
-            </main>
-          </div>
+          <SyncProvider>
+            <div className="flex h-screen overflow-hidden">
+              <Sidebar />
+              <main className="flex-1 overflow-y-auto min-w-0">
+                {children}
+              </main>
+            </div>
+          </SyncProvider>
         </body>
       </html>
     </ClerkProvider>
