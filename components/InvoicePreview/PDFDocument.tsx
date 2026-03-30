@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  Document,
+  Document as PDFDoc,
   Page,
   Text,
   View,
@@ -302,7 +302,7 @@ export default function PDFDocument({ invoice, qrDataUrl }: Props) {
   ].filter((r) => r.value && r.value.trim() !== "");
 
   return (
-    <Document>
+    <PDFDoc>
       <Page size="A4" style={styles.page}>
 
         {/* ── TOP: Logo + INVOICE title ── */}
@@ -470,6 +470,6 @@ export default function PDFDocument({ invoice, qrDataUrl }: Props) {
         )}
 
       </Page>
-    </Document>
+    </PDFDoc>
   );
 }
