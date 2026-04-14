@@ -2,6 +2,8 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { getDb, initDB } from "@/lib/db";
 
+const MAX_BODY_BYTES = 512 * 1024; // 512 KB
+
 // GET /api/invoices — list all invoices for the current user
 export async function GET() {
   await initDB();
@@ -13,7 +15,9 @@ export async function GET() {
     args: [userId],
   });
 
-  const invoices = result.rows.map((row) => JSON.parse(row.data as string));
+  const invoices = result.rows.flatMap((row) => {
+    try { return [JSON.parse(row.data as string)]; } catch { return []; }
+  });
   return NextResponse.json(invoices);
 }
 
@@ -22,7 +26,16 @@ export async function POST(req: Request) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const invoice = await req.json();
+  const contentLength = Number(req.headers.get("content-length") ?? 0);
+  if (contentLength > MAX_BODY_BYTES) {
+    return NextResponse.json({ error: "Payload too large" }, { status: 413 });
+  }
+
+  const invoice = await req.json().catch(() => null);
+  if (!invoice || typeof invoice.id !== "string") {
+    return NextResponse.json({ error: "Invalid invoice" }, { status: 400 });
+  }
+
   const now = new Date().toISOString();
 
   await getDb().execute({

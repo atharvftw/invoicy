@@ -20,7 +20,10 @@ export async function POST(req: Request) {
   await initDB();
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const body = await req.json();
+  const body = await req.json().catch(() => ({}));
+  if (!body.name || typeof body.name !== "string" || !body.name.trim()) {
+    return NextResponse.json({ error: "name is required" }, { status: 400 });
+  }
   const id = uuidv4();
   const now = new Date().toISOString();
   await getDb().execute({
