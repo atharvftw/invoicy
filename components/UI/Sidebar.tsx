@@ -174,7 +174,7 @@ export default function Sidebar() {
           <div className="px-4 pb-4 pt-3 border-t border-gray-50 flex items-center justify-between">
             <div className="text-[10px] text-gray-400">v1.0 · Invoicy</div>
             <Show when="signed-in">
-              <div className={cn(isPremium && "ring-2 ring-indigo-500 ring-offset-1 rounded-full")}>
+              <div className={cn("inline-flex items-center justify-center w-7 h-7 rounded-full", isPremium && "ring-2 ring-indigo-500 ring-offset-1")}>
                 <UserButton />
               </div>
             </Show>
