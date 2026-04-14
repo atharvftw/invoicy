@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { db, initDB } from "@/lib/db";
+import { getDb, initDB } from "@/lib/db";
 import { v4 as uuidv4 } from "uuid";
 
 // GET — list clients for current user
@@ -8,7 +8,7 @@ export async function GET() {
   await initDB();
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const result = await db.execute({
+  const result = await getDb().execute({
     sql: "SELECT * FROM clients WHERE user_id = ? ORDER BY name ASC",
     args: [userId],
   });
@@ -23,7 +23,7 @@ export async function POST(req: Request) {
   const body = await req.json();
   const id = uuidv4();
   const now = new Date().toISOString();
-  await db.execute({
+  await getDb().execute({
     sql: "INSERT INTO clients (id, user_id, name, email, address, phone, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
     args: [id, userId, body.name, body.email ?? "", body.address ?? "", body.phone ?? "", now],
   });

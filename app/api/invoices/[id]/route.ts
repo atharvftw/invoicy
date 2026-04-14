@@ -1,13 +1,13 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
 
 // DELETE /api/invoices/[id]
 export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  await db.execute({
+  await getDb().execute({
     sql: "DELETE FROM invoices WHERE id = ? AND user_id = ?",
     args: [params.id, userId],
   });
@@ -20,7 +20,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const result = await db.execute({
+  const result = await getDb().execute({
     sql: "SELECT data FROM invoices WHERE id = ? AND user_id = ?",
     args: [params.id, userId],
   });
