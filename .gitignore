@@ -32,3 +32,6 @@ Thumbs.db
 
 # Claude
 .claude/
+
+# clerk configuration (can include secrets)
+/.clerk/

@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ["@react-pdf/renderer"],
+  experimental: { serverComponentsExternalPackages: ["razorpay"] },
   webpack: (config) => {
     config.resolve.alias.canvas = false;
     return config;
