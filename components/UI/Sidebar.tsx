@@ -11,7 +11,11 @@ import {
   Zap,
   PanelLeftClose,
   PanelLeftOpen,
+  Crown,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
+import { useState } from "react";
 import { useInvoiceStore } from "@/store/invoiceStore";
 import { useUIStore } from "@/store/uiStore";
 import { cn } from "@/lib/utils";
@@ -25,6 +29,7 @@ export default function Sidebar() {
   const { newInvoice } = useInvoiceStore();
   const { sidebarOpen, toggleSidebar } = useUIStore();
   const { isPremium } = usePlan();
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   function handleNew() {
     newInvoice();
@@ -35,7 +40,7 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Collapsed state: just a slim toggle strip */}
+      {/* Collapsed state */}
       {!sidebarOpen && (
         <div className="flex flex-col items-center py-4 px-2 border-r border-gray-100 bg-white gap-3 shrink-0">
           <button
@@ -69,7 +74,7 @@ export default function Sidebar() {
           className="flex flex-col border-r border-gray-100 bg-white shrink-0"
           style={{ width: "var(--sidebar-width)" }}
         >
-          {/* Logo + collapse button */}
+          {/* Logo + collapse */}
           <div className="px-4 pt-4 pb-3 border-b border-gray-50 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center shadow-sm">
@@ -103,7 +108,7 @@ export default function Sidebar() {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-3 pt-2 space-y-0.5">
+          <nav className="flex-1 px-3 pt-2 space-y-0.5 overflow-y-auto">
             <p className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-gray-400">
               Workspace
             </p>
@@ -115,6 +120,7 @@ export default function Sidebar() {
               <History size={16} />
               History
             </Link>
+
             <div className="pt-2">
               <p className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-gray-400">
                 Coming Soon
@@ -122,19 +128,50 @@ export default function Sidebar() {
               <button className="sidebar-link w-full opacity-40 cursor-not-allowed" disabled>
                 <BarChart2 size={16} />Analytics
               </button>
-              <button className="sidebar-link w-full opacity-40 cursor-not-allowed" disabled>
-                <Settings size={16} />Settings
+
+              {/* Settings — clickable, expands premium panel */}
+              <button
+                onClick={() => setSettingsOpen((v) => !v)}
+                className={cn("sidebar-link w-full", settingsOpen && "active")}
+              >
+                <Settings size={16} />
+                Settings
+                <span className="ml-auto">
+                  {settingsOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                </span>
               </button>
+
+              {settingsOpen && (
+                <div className="mx-1 mb-1 mt-0.5 rounded-lg border border-gray-100 bg-gray-50 p-3 space-y-2">
+                  {isPremium ? (
+                    <div className="flex items-center gap-2">
+                      <Crown size={14} className="text-indigo-500 shrink-0" />
+                      <div>
+                        <p className="text-xs font-semibold text-gray-800">Premium active</p>
+                        <p className="text-[10px] text-gray-400">Watermark removed · All themes unlocked</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <Crown size={13} className="text-indigo-400" />
+                        <p className="text-[11px] font-semibold text-gray-700">Upgrade to Premium</p>
+                      </div>
+                      <ul className="text-[10px] text-gray-500 space-y-0.5 mb-2 pl-1">
+                        <li>· Remove PDF watermark</li>
+                        <li>· All 5 invoice themes</li>
+                        <li>· Recurring invoices</li>
+                      </ul>
+                      <UpgradeButton />
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           </nav>
 
-          {!isPremium && sidebarOpen && (
-            <div className="px-3 pb-3">
-              <UpgradeButton />
-            </div>
-          )}
           <div className="px-4 pb-4 pt-3 border-t border-gray-50 flex items-center justify-between">
-            <div className="text-[10px] text-gray-400">v2.0 · Mini Financial OS</div>
+            <div className="text-[10px] text-gray-400">v1.0 · Invoicy</div>
             <Show when="signed-in">
               <UserButton />
             </Show>
