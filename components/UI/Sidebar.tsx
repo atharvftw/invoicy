@@ -77,12 +77,14 @@ export default function Sidebar() {
           {/* Logo + collapse */}
           <div className="px-4 pt-4 pb-3 border-b border-gray-50 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center shadow-sm">
+              <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shadow-sm", isPremium ? "bg-gradient-to-br from-indigo-500 to-violet-600" : "bg-indigo-600")}>
                 <Zap size={14} className="text-white fill-white" />
               </div>
               <div>
-                <span className="text-sm font-bold text-gray-900 tracking-tight">Invoicy</span>
-                <p className="text-[10px] text-gray-400 leading-none mt-0.5">Smart billing</p>
+                <span className="text-sm font-bold text-gray-900 tracking-tight">
+                  {isPremium ? "InvoicyPro" : "Invoicy"}
+                </span>
+                <p className="text-[10px] text-gray-400 leading-none mt-0.5">{isPremium ? "Premium" : "Smart billing"}</p>
               </div>
             </div>
             <button
@@ -172,7 +174,9 @@ export default function Sidebar() {
           <div className="px-4 pb-4 pt-3 border-t border-gray-50 flex items-center justify-between">
             <div className="text-[10px] text-gray-400">v1.0 · Invoicy</div>
             <Show when="signed-in">
-              <UserButton />
+              <div className={cn(isPremium && "ring-2 ring-indigo-500 ring-offset-1 rounded-full")}>
+                <UserButton />
+              </div>
             </Show>
             <Show when="signed-out">
               <SignInButton mode="modal">
