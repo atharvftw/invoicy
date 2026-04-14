@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
+import confetti from "canvas-confetti";
 
 export default function UpgradeButton() {
   const { user } = useUser();
@@ -24,8 +25,12 @@ export default function UpgradeButton() {
         setError(data.error ?? "Invalid code");
         return;
       }
+      // Fire confetti then reload
+      confetti({ particleCount: 180, spread: 120, origin: { y: 0.5 }, colors: ["#4f46e5", "#818cf8", "#a5b4fc", "#ffffff", "#fbbf24"] });
+      confetti({ particleCount: 80, angle: 60, spread: 80, origin: { x: 0, y: 0.6 } });
+      confetti({ particleCount: 80, angle: 120, spread: 80, origin: { x: 1, y: 0.6 } });
       await user?.reload();
-      window.location.reload();
+      setTimeout(() => window.location.reload(), 2200);
     } catch {
       setError("Something went wrong.");
     } finally {
