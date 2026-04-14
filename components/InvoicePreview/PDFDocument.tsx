@@ -8,8 +8,7 @@ import {
   StyleSheet,
   Image,
 } from "@react-pdf/renderer";
-import { Invoice, Currency, InvoiceTheme } from "@/types/invoice";
-import { formatDate } from "@/lib/utils";
+import { Invoice, Currency } from "@/types/invoice";
 
 // Helvetica doesn't support ₹ (U+20B9) or € (U+20AC) — use text fallbacks
 const PDF_CURRENCY_SYMBOLS: Record<Currency, string> = {
@@ -18,43 +17,17 @@ const PDF_CURRENCY_SYMBOLS: Record<Currency, string> = {
   EUR: "EUR ",
   GBP: "\u00a3",
 };
+import { formatDate } from "@/lib/utils";
 
-type ThemeColors = {
-  dark: string; mid: string; light: string; border: string;
-  balanceBg: string; white: string; page: string;
-  accent: string; accentText: string; headerBg: string;
+const C = {
+  dark: "#2d2d2d",
+  mid: "#555555",
+  light: "#888888",
+  border: "#e0e0e0",
+  balanceBg: "#f0f0f0",
+  white: "#ffffff",
+  page: "#ffffff",
 };
-
-const THEME_COLORS: Record<InvoiceTheme, ThemeColors> = {
-  classic: {
-    dark: "#2d2d2d", mid: "#555555", light: "#888888", border: "#e0e0e0",
-    balanceBg: "#f0f0f0", white: "#ffffff", page: "#ffffff",
-    accent: "#2d2d2d", accentText: "#ffffff", headerBg: "#2d2d2d",
-  },
-  minimal: {
-    dark: "#374151", mid: "#6b7280", light: "#9ca3af", border: "#e5e7eb",
-    balanceBg: "#f9fafb", white: "#ffffff", page: "#ffffff",
-    accent: "#6b7280", accentText: "#ffffff", headerBg: "#6b7280",
-  },
-  modern: {
-    dark: "#1e1b4b", mid: "#4338ca", light: "#818cf8", border: "#e0e7ff",
-    balanceBg: "#eef2ff", white: "#ffffff", page: "#ffffff",
-    accent: "#4f46e5", accentText: "#ffffff", headerBg: "#4f46e5",
-  },
-  corporate: {
-    dark: "#0c2340", mid: "#1e4d80", light: "#4a7ab5", border: "#cdd9e5",
-    balanceBg: "#e8f0f8", white: "#ffffff", page: "#ffffff",
-    accent: "#0f4c81", accentText: "#ffffff", headerBg: "#0f4c81",
-  },
-  retro: {
-    dark: "#4a3728", mid: "#7c5c45", light: "#a0856e", border: "#e8d5c0",
-    balanceBg: "#fdf0e0", white: "#fffbf5", page: "#fdf6e3",
-    accent: "#92400e", accentText: "#fffbf5", headerBg: "#92400e",
-  },
-};
-
-// Default fallback used for static StyleSheet — theme colours applied inline
-const C = THEME_COLORS.classic;
 
 const styles = StyleSheet.create({
   page: {
@@ -298,37 +271,14 @@ const styles = StyleSheet.create({
     color: C.light,
     textAlign: "center",
   },
-  watermark: {
-    position: "absolute",
-    bottom: 10,
-    left: 0,
-    right: 0,
-    textAlign: "center",
-    fontSize: 7,
-    color: "#cccccc",
-  },
-
-  /* ── SIGNATURE ── */
-  signatureBlock: { alignItems: "flex-end", marginBottom: 16, marginTop: 8 },
-  signatureImage: { maxWidth: 160, maxHeight: 60, objectFit: "contain" },
-  signatureLine: {
-    fontSize: 8,
-    color: "#888888",
-    borderTop: "1px solid #e0e0e0",
-    paddingTop: 4,
-    marginTop: 4,
-    width: 160,
-  },
 });
 
 interface Props {
   invoice: Invoice;
   qrDataUrl?: string;
-  isPremium?: boolean;
 }
 
-export default function PDFDocument({ invoice, qrDataUrl, isPremium = false }: Props) {
-  const TC = THEME_COLORS[invoice.theme] ?? THEME_COLORS.classic;
+export default function PDFDocument({ invoice, qrDataUrl }: Props) {
   const sym = PDF_CURRENCY_SYMBOLS[invoice.currency];
   const fmt = (n: number) =>
     `${sym}${n.toLocaleString("en-IN", {
@@ -353,13 +303,14 @@ export default function PDFDocument({ invoice, qrDataUrl, isPremium = false }: P
 
   return (
     <PDFDoc>
-      <Page size="A4" style={[styles.page, { backgroundColor: TC.page }]}>
+      <Page size="A4" style={styles.page}>
 
         {/* ── TOP: Logo + INVOICE title ── */}
         <View style={styles.topRow}>
           {/* Logo or empty space */}
           <View>
             {invoice.logo ? (
+              {/* eslint-disable-next-line jsx-a11y/alt-text */}
               <Image src={invoice.logo} style={styles.logo} />
             ) : (
               <View style={styles.logoPlaceholder} />
@@ -414,9 +365,9 @@ export default function PDFDocument({ invoice, qrDataUrl, isPremium = false }: P
               </View>
             ))}
             {/* Balance Due highlighted row */}
-            <View style={[styles.balanceRow, { backgroundColor: TC.balanceBg }]}>
-              <Text style={[styles.balanceLabel, { color: TC.dark }]}>Balance Due:</Text>
-              <Text style={[styles.balanceValue, { color: TC.accent }]}>{fmt(invoice.balance_due)}</Text>
+            <View style={styles.balanceRow}>
+              <Text style={styles.balanceLabel}>Balance Due:</Text>
+              <Text style={styles.balanceValue}>{fmt(invoice.balance_due)}</Text>
             </View>
           </View>
         </View>
@@ -424,7 +375,7 @@ export default function PDFDocument({ invoice, qrDataUrl, isPremium = false }: P
         {/* ── LINE ITEMS TABLE ── */}
         <View style={styles.tableContainer}>
           {/* Header */}
-          <View style={[styles.tableHeaderRow, { backgroundColor: TC.headerBg }]}>
+          <View style={styles.tableHeaderRow}>
             <Text style={styles.thItem}>Item</Text>
             <Text style={styles.thRight}>Quantity</Text>
             <Text style={styles.thRight}>Rate</Text>
@@ -484,14 +435,6 @@ export default function PDFDocument({ invoice, qrDataUrl, isPremium = false }: P
           </View>
         </View>
 
-        {/* ── SIGNATURE ── */}
-        {invoice.signature && (
-          <View style={styles.signatureBlock}>
-            <Image src={invoice.signature} style={styles.signatureImage} />
-            <Text style={styles.signatureLine}>Authorized Signature</Text>
-          </View>
-        )}
-
         {/* ── FOOTER: Notes + Terms + QR ── */}
         {(invoice.notes || invoice.terms || (invoice.custom_sections ?? []).some(s => s.content) || (invoice.payment_qr && qrDataUrl)) && (
           <View style={styles.footerRow}>
@@ -518,17 +461,12 @@ export default function PDFDocument({ invoice, qrDataUrl, isPremium = false }: P
 
             {invoice.payment_qr && qrDataUrl ? (
               <View style={styles.qrBlock}>
+                {/* eslint-disable-next-line jsx-a11y/alt-text */}
                 <Image src={qrDataUrl} style={styles.qrImage} />
                 <Text style={styles.qrLabel}>Scan to pay</Text>
               </View>
             ) : null}
           </View>
-        )}
-
-        {!isPremium && (
-          <Text style={styles.watermark} fixed>
-            Made with Invoicy · invoicy.app · Upgrade to remove
-          </Text>
         )}
 
       </Page>

@@ -3,7 +3,6 @@
 import { useState, useCallback } from "react";
 import { Download, Loader2 } from "lucide-react";
 import { Invoice } from "@/types/invoice";
-import { usePlan } from "@/hooks/usePlan";
 
 interface Props {
   invoice: Invoice;
@@ -11,7 +10,6 @@ interface Props {
 
 export default function PDFDownloadButton({ invoice }: Props) {
   const [loading, setLoading] = useState(false);
-  const { isPremium } = usePlan();
 
   const handleDownload = useCallback(async () => {
     setLoading(true);
@@ -32,7 +30,7 @@ export default function PDFDownloadButton({ invoice }: Props) {
       const { createElement } = await import("react");
 
       // Cast to satisfy @react-pdf/renderer's strict DocumentProps typing
-      const doc = createElement(PDFDocument as any, { invoice, qrDataUrl, isPremium }); // eslint-disable-line
+      const doc = createElement(PDFDocument as any, { invoice, qrDataUrl }); // eslint-disable-line
       const blob = await pdf(doc as any).toBlob(); // eslint-disable-line
 
       const url = URL.createObjectURL(blob);
@@ -46,7 +44,7 @@ export default function PDFDownloadButton({ invoice }: Props) {
     } finally {
       setLoading(false);
     }
-  }, [invoice, isPremium]);
+  }, [invoice]);
 
   return (
     <button

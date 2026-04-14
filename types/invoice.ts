@@ -1,6 +1,6 @@
 export type Currency = "INR" | "USD" | "EUR" | "GBP";
 export type InvoiceStatus = "draft" | "sent" | "paid" | "partially_paid";
-export type InvoiceTheme = "classic" | "minimal" | "modern" | "corporate" | "retro";
+export type InvoiceTheme = "classic" | "minimal";
 
 export interface Party {
   name: string;
@@ -28,21 +28,6 @@ export interface CustomSection {
   content: string;
 }
 
-export interface Client {
-  id: string;
-  name: string;
-  email: string;
-  address: string;
-  phone: string;
-  created_at: string;
-}
-
-export interface Recurrence {
-  frequency: "weekly" | "monthly" | "quarterly";
-  nextDate: string;
-  active: boolean;
-}
-
 export interface Invoice {
   id: string;
   invoice_number: string;
@@ -68,8 +53,6 @@ export interface Invoice {
   payment_qr?: string;    // UPI ID or URL
   logo?: string;          // base64
   subtitle?: string;      // tagline below logo
-  signature?: string;     // base64
-  recurrence?: Recurrence;
   date: string;
   due_date: string;
   payment_terms: string;
@@ -136,8 +119,6 @@ export function createEmptyInvoice(): Invoice {
     payment_qr: "",
     logo: "",
     subtitle: "",
-    signature: "",
-    recurrence: undefined,
     date: now.toISOString().split("T")[0],
     due_date: due.toISOString().split("T")[0],
     payment_terms: "Net 30",

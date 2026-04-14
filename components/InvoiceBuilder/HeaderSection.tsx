@@ -2,16 +2,8 @@
 
 import { useRef } from "react";
 import { Upload, X } from "lucide-react";
-import { Invoice, InvoiceTheme } from "@/types/invoice";
+import { Invoice } from "@/types/invoice";
 import { Input, Select } from "@/components/UI/Input";
-
-const THEMES: { value: InvoiceTheme; label: string; accent: string }[] = [
-  { value: "classic", label: "Classic", accent: "#2d2d2d" },
-  { value: "minimal", label: "Minimal", accent: "#6b7280" },
-  { value: "modern", label: "Modern", accent: "#4f46e5" },
-  { value: "corporate", label: "Corporate", accent: "#0f4c81" },
-  { value: "retro", label: "Retro", accent: "#92400e" },
-];
 
 const PAYMENT_TERMS = [
   { value: "Due on Receipt", label: "Due on Receipt" },
@@ -134,30 +126,6 @@ export default function HeaderSection({ invoice, onChange }: Props) {
           onChange={(e) => onChange({ po_number: e.target.value })}
           placeholder="Optional"
         />
-
-        {/* Theme Selector */}
-        <div className="col-span-2">
-          <label className="label-base">Invoice Theme</label>
-          <div className="flex gap-2 flex-wrap mt-1">
-            {THEMES.map((t) => (
-              <button
-                key={t.value}
-                onClick={() => onChange({ theme: t.value })}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${
-                  invoice.theme === t.value
-                    ? "border-indigo-500 bg-indigo-50 text-indigo-700 ring-1 ring-indigo-400"
-                    : "border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50"
-                }`}
-              >
-                <span
-                  className="w-3 h-3 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: t.accent }}
-                />
-                {t.label}
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   );

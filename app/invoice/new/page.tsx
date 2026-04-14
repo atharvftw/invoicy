@@ -10,7 +10,6 @@ import PartySection from "@/components/InvoiceBuilder/PartySection";
 import LineItems from "@/components/InvoiceBuilder/LineItems";
 import Financials from "@/components/InvoiceBuilder/Financials";
 import NotesSection from "@/components/InvoiceBuilder/NotesSection";
-import SignatureSection from "@/components/InvoiceBuilder/SignatureSection";
 import InvoicePreview from "@/components/InvoicePreview/InvoicePreview";
 import PDFDownloadButton from "@/components/InvoicePreview/PDFDownloadButton";
 import GmailButton from "@/components/InvoicePreview/GmailButton";
@@ -85,7 +84,6 @@ export default function NewInvoicePage() {
           <LineItems invoice={currentInvoice} onChange={onChange} />
           <Financials invoice={currentInvoice} onChange={onChange} />
           <NotesSection invoice={currentInvoice} onChange={onChange} />
-          <SignatureSection />
           <div className="pb-8" />
         </div>
       </div>

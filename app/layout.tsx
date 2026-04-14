@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider afterSignOutUrl="/invoice/new">
+    <ClerkProvider>
       <html lang="en">
         <body className="grain">
           <SyncProvider>
