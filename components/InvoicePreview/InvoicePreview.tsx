@@ -1,14 +1,23 @@
 "use client";
 
-import { Invoice, CURRENCY_SYMBOLS } from "@/types/invoice";
+import { Invoice, CURRENCY_SYMBOLS, InvoiceTheme } from "@/types/invoice";
 import { formatDate } from "@/lib/utils";
 import QRCodeComponent from "./QRCodeComponent";
+
+const PREVIEW_THEME: Record<InvoiceTheme, { headerBg: string; balanceBg: string; accentColor: string; pageColor: string }> = {
+  classic:   { headerBg: "#2d2d2d", balanceBg: "#f2f2f2", accentColor: "#2d2d2d", pageColor: "#ffffff" },
+  minimal:   { headerBg: "#6b7280", balanceBg: "#f9fafb", accentColor: "#6b7280", pageColor: "#ffffff" },
+  modern:    { headerBg: "#4f46e5", balanceBg: "#eef2ff", accentColor: "#4f46e5", pageColor: "#ffffff" },
+  corporate: { headerBg: "#0f4c81", balanceBg: "#e8f0f8", accentColor: "#0f4c81", pageColor: "#ffffff" },
+  retro:     { headerBg: "#92400e", balanceBg: "#fdf0e0", accentColor: "#92400e", pageColor: "#fdf6e3" },
+};
 
 interface Props {
   invoice: Invoice;
 }
 
 export default function InvoicePreview({ invoice }: Props) {
+  const theme = PREVIEW_THEME[invoice.theme] ?? PREVIEW_THEME.classic;
   const sym = CURRENCY_SYMBOLS[invoice.currency];
   const fmt = (n: number) =>
     `${sym}${n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -30,7 +39,7 @@ export default function InvoicePreview({ invoice }: Props) {
 
   return (
     <div
-      className="paper rounded-lg bg-white w-full overflow-hidden"
+      className="paper rounded-lg w-full overflow-hidden"
       style={{
         fontFamily: "'DM Sans', sans-serif",
         padding: "32px 32px",
@@ -38,6 +47,7 @@ export default function InvoicePreview({ invoice }: Props) {
         color: "#2d2d2d",
         lineHeight: 1.5,
         boxSizing: "border-box",
+        backgroundColor: theme.pageColor,
       }}
     >
       {/* ── TOP: Logo + INVOICE ── */}
@@ -121,7 +131,7 @@ export default function InvoicePreview({ invoice }: Props) {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              backgroundColor: "#f2f2f2",
+              backgroundColor: theme.balanceBg,
               padding: "7px 8px",
               marginTop: 3,
               gap: 8,
@@ -136,7 +146,7 @@ export default function InvoicePreview({ invoice }: Props) {
       {/* ── LINE ITEMS TABLE ── */}
       <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 10 }}>
         <thead>
-          <tr style={{ backgroundColor: "#2d2d2d" }}>
+          <tr style={{ backgroundColor: theme.headerBg }}>
             <th style={{ textAlign: "left", padding: "8px 10px", fontSize: 8, fontWeight: 700, color: "#fff", textTransform: "uppercase", letterSpacing: 0.5 }}>
               Item
             </th>

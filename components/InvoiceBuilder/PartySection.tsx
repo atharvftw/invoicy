@@ -1,7 +1,8 @@
 "use client";
 
-import { Invoice, Party } from "@/types/invoice";
+import { Client, Invoice, Party } from "@/types/invoice";
 import { Input, Textarea } from "@/components/UI/Input";
+import ClientAutocomplete from "@/components/UI/ClientAutocomplete";
 
 interface Props {
   invoice: Invoice;
@@ -70,11 +71,29 @@ export default function PartySection({ invoice, onChange }: Props) {
         {/* Vertical divider */}
         <div className="w-px bg-gray-100 mx-5 self-stretch shrink-0" />
 
-        <PartyFields
-          label="Bill To (Client)"
-          value={invoice.bill_to}
-          onUpdate={(updates) => onChange({ bill_to: { ...invoice.bill_to, ...updates } })}
-        />
+        <div className="flex flex-col flex-1 min-w-0">
+          <ClientAutocomplete
+            onSelect={(client: Client) =>
+              onChange({
+                bill_to: {
+                  name: client.name,
+                  email: client.email,
+                  address: client.address,
+                  phone: client.phone,
+                },
+              })
+            }
+            currentName={invoice.bill_to.name}
+            currentEmail={invoice.bill_to.email}
+            currentAddress={invoice.bill_to.address}
+            currentPhone={invoice.bill_to.phone}
+          />
+          <PartyFields
+            label="Bill To (Client)"
+            value={invoice.bill_to}
+            onUpdate={(updates) => onChange({ bill_to: { ...invoice.bill_to, ...updates } })}
+          />
+        </div>
       </div>
     </div>
   );

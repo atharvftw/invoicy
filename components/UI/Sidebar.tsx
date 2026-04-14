@@ -16,12 +16,15 @@ import { useInvoiceStore } from "@/store/invoiceStore";
 import { useUIStore } from "@/store/uiStore";
 import { cn } from "@/lib/utils";
 import { SignInButton, Show, UserButton } from "@clerk/nextjs";
+import { usePlan } from "@/hooks/usePlan";
+import UpgradeButton from "@/components/UI/UpgradeButton";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { newInvoice } = useInvoiceStore();
   const { sidebarOpen, toggleSidebar } = useUIStore();
+  const { isPremium } = usePlan();
 
   function handleNew() {
     newInvoice();
@@ -125,10 +128,15 @@ export default function Sidebar() {
             </div>
           </nav>
 
+          {!isPremium && sidebarOpen && (
+            <div className="px-3 pb-3">
+              <UpgradeButton />
+            </div>
+          )}
           <div className="px-4 pb-4 pt-3 border-t border-gray-50 flex items-center justify-between">
             <div className="text-[10px] text-gray-400">v2.0 · Mini Financial OS</div>
             <Show when="signed-in">
-              <UserButton afterSignOutUrl="/invoice/new" />
+              <UserButton />
             </Show>
             <Show when="signed-out">
               <SignInButton mode="modal">
