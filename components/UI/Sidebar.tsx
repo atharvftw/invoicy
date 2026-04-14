@@ -142,28 +142,27 @@ export default function Sidebar() {
               </button>
 
               {settingsOpen && (
-                <div className="mx-1 mb-1 mt-0.5 rounded-lg border border-gray-100 bg-gray-50 p-3 space-y-2">
+                <div className="mx-1 mb-1 mt-0.5 rounded-lg border border-gray-100 bg-gray-50 p-2.5 overflow-hidden">
                   {isPremium ? (
                     <div className="flex items-center gap-2">
-                      <Crown size={14} className="text-indigo-500 shrink-0" />
-                      <div>
-                        <p className="text-xs font-semibold text-gray-800">Premium active</p>
-                        <p className="text-[10px] text-gray-400">Watermark removed · All themes unlocked</p>
+                      <Crown size={13} className="text-indigo-500 shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-[11px] font-semibold text-gray-800">Premium active</p>
+                        <p className="text-[10px] text-gray-400 truncate">Watermark removed · All themes</p>
                       </div>
                     </div>
                   ) : (
-                    <>
-                      <div className="flex items-center gap-1.5 mb-1">
-                        <Crown size={13} className="text-indigo-400" />
-                        <p className="text-[11px] font-semibold text-gray-700">Upgrade to Premium</p>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-1.5">
+                        <Crown size={12} className="text-indigo-400 shrink-0" />
+                        <p className="text-[11px] font-semibold text-gray-700">Unlock Premium</p>
                       </div>
-                      <ul className="text-[10px] text-gray-500 space-y-0.5 mb-2 pl-1">
+                      <ul className="text-[10px] text-gray-500 space-y-0.5 pl-0.5">
                         <li>· Remove PDF watermark</li>
                         <li>· All 5 invoice themes</li>
-                        <li>· Recurring invoices</li>
                       </ul>
                       <UpgradeButton />
-                    </>
+                    </div>
                   )}
                 </div>
               )}
