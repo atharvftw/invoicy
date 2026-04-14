@@ -151,25 +151,7 @@ export default function NotesSection({ invoice, onChange }: Props) {
         )}
       </div>
 
-      {/* Theme */}
-      <div>
-        <label className="label-base">Invoice Theme</label>
-        <div className="flex gap-2">
-          {(["classic", "minimal"] as const).map((theme) => (
-            <button
-              key={theme}
-              onClick={() => onChange({ theme })}
-              className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${
-                invoice.theme === theme
-                  ? "border-indigo-400 bg-indigo-50 text-indigo-700"
-                  : "border-gray-200 bg-white text-gray-500 hover:border-gray-300"
-              }`}
-            >
-              {theme.charAt(0).toUpperCase() + theme.slice(1)}
-            </button>
-          ))}
-        </div>
-      </div>
+      
     </div>
   );
 }
