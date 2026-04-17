@@ -52,7 +52,7 @@ export default function PDFDownloadButton({ invoice }: Props) {
     <button
       onClick={handleDownload}
       disabled={loading}
-      className="flex items-center gap-2 px-5 py-2.5 rounded-lg
+      className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-2 sm:py-2.5 rounded-lg
         bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800
         text-white text-sm font-semibold shadow-sm
         transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
@@ -62,7 +62,7 @@ export default function PDFDownloadButton({ invoice }: Props) {
       ) : (
         <Download size={15} />
       )}
-      {loading ? "Generating…" : "Download PDF"}
+      <span className="hidden sm:inline">{loading ? "Generating…" : "Download PDF"}</span>
     </button>
   );
 }

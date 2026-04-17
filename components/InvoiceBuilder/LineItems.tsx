@@ -47,8 +47,8 @@ export default function LineItems({ invoice, onChange }: Props) {
         Line Items
       </h3>
 
-      <div className="w-full">
-        <table className="items-table w-full text-sm" style={{ tableLayout: "fixed" }}>
+      <div className="w-full overflow-x-auto">
+        <table className="items-table w-full text-sm min-w-[420px]" style={{ tableLayout: "fixed" }}>
           <colgroup>
             <col />
             <col style={{ width: 68 }} />

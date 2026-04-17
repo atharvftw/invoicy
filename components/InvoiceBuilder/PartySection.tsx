@@ -61,15 +61,15 @@ export default function PartySection({ invoice, onChange }: Props) {
         Parties
       </h3>
 
-      <div className="flex gap-0">
+      <div className="flex flex-col sm:flex-row gap-0">
         <PartyFields
           label="From (You)"
           value={invoice.from}
           onUpdate={(updates) => onChange({ from: { ...invoice.from, ...updates } })}
         />
 
-        {/* Vertical divider */}
-        <div className="w-px bg-gray-100 mx-5 self-stretch shrink-0" />
+        {/* Divider — horizontal on mobile, vertical on desktop */}
+        <div className="h-px bg-gray-100 my-4 sm:my-0 sm:w-px sm:h-auto sm:mx-5 sm:self-stretch shrink-0" />
 
         <div className="flex flex-col flex-1 min-w-0">
           <ClientAutocomplete

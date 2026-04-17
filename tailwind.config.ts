@@ -9,9 +9,9 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-geist)", "system-ui", "sans-serif"],
-        mono: ["var(--font-mono)", "monospace"],
-        display: ["var(--font-display)", "sans-serif"],
+        sans:    ["var(--font-geist)", "Plus Jakarta Sans", "system-ui", "sans-serif"],
+        mono:    ["var(--font-mono)", "monospace"],
+        display: ["Syne", "system-ui", "sans-serif"],
       },
       colors: {
         indigo: {

@@ -8,13 +8,14 @@ import {
   Plus,
   BarChart2,
   Settings,
-  Zap,
   PanelLeftClose,
   PanelLeftOpen,
   Crown,
   ChevronDown,
   ChevronUp,
+  Menu,
 } from "lucide-react";
+import Logo from "@/components/Logo";
 import { useState } from "react";
 import { useInvoiceStore } from "@/store/invoiceStore";
 import { useUIStore } from "@/store/uiStore";
@@ -40,9 +41,20 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Collapsed state */}
+      {/* Mobile floating hamburger — visible only on small screens when sidebar is closed */}
       {!sidebarOpen && (
-        <div className="flex flex-col items-center py-4 px-2 border-r border-gray-100 bg-white gap-3 shrink-0">
+        <button
+          onClick={toggleSidebar}
+          className="lg:hidden fixed top-3 left-3 z-50 p-2 rounded-lg bg-white border border-gray-100 shadow-sm text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+          title="Open menu"
+        >
+          <Menu size={18} />
+        </button>
+      )}
+
+      {/* Collapsed state — desktop only */}
+      {!sidebarOpen && (
+        <div className="hidden lg:flex flex-col items-center py-4 px-2 border-r border-gray-100 bg-white gap-3 shrink-0">
           <button
             onClick={toggleSidebar}
             className="p-2 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
@@ -70,23 +82,19 @@ export default function Sidebar() {
 
       {/* Expanded sidebar */}
       {sidebarOpen && (
+        <>
+          {/* Mobile backdrop */}
+          <div
+            className="fixed inset-0 bg-black/20 z-40 lg:hidden"
+            onClick={toggleSidebar}
+          />
         <aside
-          className="flex flex-col border-r border-gray-100 bg-white shrink-0"
+          className="fixed inset-y-0 left-0 z-50 flex flex-col border-r border-gray-100 bg-white shrink-0 lg:static lg:inset-auto lg:z-auto"
           style={{ width: "var(--sidebar-width)" }}
         >
           {/* Logo + collapse */}
           <div className="px-4 pt-4 pb-3 border-b border-gray-50 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shadow-sm", isPremium ? "bg-gradient-to-br from-indigo-500 to-violet-600" : "bg-indigo-600")}>
-                <Zap size={14} className="text-white fill-white" />
-              </div>
-              <div>
-                <span className="text-sm font-bold text-gray-900 tracking-tight">
-                  {isPremium ? "InvoicyPro" : "Invoicy"}
-                </span>
-                <p className="text-[10px] text-gray-400 leading-none mt-0.5">{isPremium ? "Premium" : "Smart billing"}</p>
-              </div>
-            </div>
+            <Logo variant="full" size={28} />
             <button
               onClick={toggleSidebar}
               className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
@@ -187,6 +195,7 @@ export default function Sidebar() {
             </Show>
           </div>
         </aside>
+        </>
       )}
     </>
   );

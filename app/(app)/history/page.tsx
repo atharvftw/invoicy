@@ -93,7 +93,7 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-6">
+    <div className="max-w-5xl mx-auto px-3 sm:px-6 py-6 pt-14 lg:pt-6">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-xl font-bold text-gray-900">Invoice History</h1>
@@ -104,7 +104,7 @@ export default function HistoryPage() {
 
       {/* Stats */}
       {invoices.length > 0 && (
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
           <div className="section-card flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
               <TrendingUp size={16} className="text-green-600" />
@@ -140,8 +140,8 @@ export default function HistoryPage() {
       )}
 
       {/* Filters */}
-      <div className="flex items-center gap-3 mb-4">
-        <div className="relative flex-1 max-w-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-4">
+        <div className="relative w-full sm:flex-1 sm:max-w-xs">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             value={search}
@@ -151,7 +151,7 @@ export default function HistoryPage() {
           />
         </div>
 
-        <div className="flex gap-1.5">
+        <div className="flex flex-wrap gap-1.5">
           <button
             onClick={() => setStatusFilter("all")}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
@@ -182,8 +182,8 @@ export default function HistoryPage() {
       {sorted.length === 0 ? (
         <EmptyState hasInvoices={invoices.length > 0} />
       ) : (
-        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-card">
-          <table className="w-full">
+        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-card overflow-x-auto">
+          <table className="w-full min-w-[560px]">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50">
                 <th className="text-left text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">
@@ -261,7 +261,7 @@ export default function HistoryPage() {
                         setOpenMenu(openMenu === inv.id ? null : inv.id);
                       }}
                       className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100
-                        opacity-0 group-hover:opacity-100 transition-all"
+                        opacity-60 sm:opacity-0 group-hover:opacity-100 transition-all"
                     >
                       <MoreVertical size={14} />
                     </button>

@@ -121,14 +121,14 @@ export default function GmailButton({ invoice }: Props) {
   return (
     <button
       onClick={handleClick}
-      className="flex items-center gap-2 px-4 py-2 rounded-lg
+      className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-lg
         bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50
         text-gray-700 text-sm font-medium shadow-sm
         transition-all duration-150"
       title="Send via Gmail"
     >
       <Mail size={15} className="text-red-500" />
-      Email
+      <span className="hidden sm:inline">Email</span>
     </button>
   );
 }
