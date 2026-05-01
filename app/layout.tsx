@@ -10,9 +10,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider afterSignOutUrl="/">
+    <ClerkProvider
+      afterSignOutUrl="/"
+      signInForceRedirectUrl="/invoice/new"
+      signInFallbackRedirectUrl="/invoice/new"
+      signUpForceRedirectUrl="/invoice/new"
+      signUpFallbackRedirectUrl="/invoice/new"
+    >
       <html lang="en">
-        <body className="grain">{children}</body>
+        <body>{children}</body>
       </html>
     </ClerkProvider>
   );

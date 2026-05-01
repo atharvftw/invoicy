@@ -1,0 +1,2228 @@
+<!DOCTYPE html><script>"use strict";
+(() => {
+  (function() {
+    if (!window.parent || window.parent === window) return;
+    const parentFrame = window.parent;
+    const send = function(error) {
+      try {
+        parentFrame.postMessage({ type: "IFRAME_JS_ERROR", error }, "*");
+      } catch (_x) {
+      }
+    };
+    window.onerror = function(message, url, line, col, errorObj) {
+      send({
+        message: String(message),
+        url: url || "",
+        line: line || 0,
+        col: col || 0,
+        stack: errorObj && errorObj.stack || ""
+      });
+    };
+    window.addEventListener("unhandledrejection", function(event) {
+      send({
+        message: String(event.reason),
+        stack: event.reason && event.reason.stack || ""
+      });
+    });
+    const queue = [];
+    let running = false;
+    function processQueue() {
+      if (running || !queue.length) return;
+      running = true;
+      const item = queue.shift();
+      fetch(item.url).then(function(response) {
+        return response.ok ? response.text() : Promise.reject();
+      }).then(function(text) {
+        const script = document.createElement("script");
+        if (item.type) script.type = item.type;
+        script.textContent = text + "\n//# sourceURL=" + item.url;
+        if (item.el.onload) script.onload = item.el.onload;
+        if (item.el.onerror) script.onerror = item.el.onerror;
+        try {
+          item.parentNode.insertBefore(script, item.nextSibling);
+        } catch (_e) {
+          try {
+            item.parentNode.appendChild(script);
+          } catch (_e2) {
+          }
+        }
+      }).catch(function() {
+        return new Promise(function(resolve) {
+          if (!item.parentNode.isConnected) {
+            resolve();
+            return;
+          }
+          const fallback = document.createElement("script");
+          fallback.async = false;
+          fallback.src = item.url;
+          if (item.type) fallback.type = item.type;
+          if (item.el.onload) fallback.onload = item.el.onload;
+          if (item.el.onerror) fallback.onerror = item.el.onerror;
+          fallback.setAttribute("data-ha-processed", "1");
+          fallback.addEventListener("load", function() {
+            resolve();
+          });
+          fallback.addEventListener("error", function() {
+            resolve();
+          });
+          try {
+            item.parentNode.insertBefore(fallback, item.nextSibling);
+          } catch (_e) {
+            try {
+              item.parentNode.appendChild(fallback);
+            } catch (_e2) {
+              resolve();
+            }
+          }
+        });
+      }).then(function() {
+        running = false;
+        processQueue();
+      });
+    }
+    new MutationObserver(function(mutations) {
+      for (let i = 0; i < mutations.length; i++) {
+        const addedNodes = mutations[i].addedNodes;
+        for (let j = 0; j < addedNodes.length; j++) {
+          const node = addedNodes[j];
+          if (node.nodeName === "SCRIPT" && node.src && node.type !== "module" && !node.hasAttribute("data-ha-processed") && !(node.parentNode && node.parentNode.nodeName === "HEAD")) {
+            node.setAttribute("data-ha-processed", "1");
+            const par = node.parentNode;
+            if (!par) continue;
+            const sib = node.nextSibling;
+            par.removeChild(node);
+            queue.push({
+              url: node.src,
+              el: node,
+              type: node.type,
+              parentNode: par,
+              nextSibling: sib
+            });
+          }
+        }
+      }
+      processQueue();
+    }).observe(document.documentElement, { childList: true, subtree: true });
+  })();
+})();
+</script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta property="og:title" content="Invoicy | Automate Invoices &amp; Get Paid Faster">
+    <meta property="og:url" content="https://pub.hyperagent.com/p/tOpF4wBtvQOyYwaxwJxgiQ">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Shared via Hyperagent">
+    <meta property="og:image" content="https://hyperagent.com/static/og-card/hyperagent-icon-1024.png">
+    <meta property="og:image:width" content="1024">
+    <meta property="og:image:height" content="1024">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Invoicy | Automate Invoices &amp; Get Paid Faster">
+    <meta name="twitter:image" content="https://hyperagent.com/static/og-card/hyperagent-icon-1024.png">
+    <link rel="icon" type="image/svg+xml" href="https://hyperagent.com/static/favicons/icon.svg">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invoicy | Automate Invoices & Get Paid Faster</title>
+  <meta name="description" content="Generate professional PDF invoices, set up automated email and WhatsApp payment reminders, and stop chasing clients. Start for free today." />
+  <meta name="keywords" content="automated invoice generator India, invoice reminder software, freelance invoicing tool, free PDF invoice maker, automate payment reminders, recurring billing for freelancers, GST invoice" />
+  <meta name="author" content="Invoicy" />
+  <meta name="theme-color" content="#4F46E5" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Invoicy | Automate Invoices & Get Paid Faster" />
+  <meta property="og:description" content="Generate professional PDF invoices, set up automated email and WhatsApp payment reminders, and stop chasing clients." />
+  <meta property="og:locale" content="en_IN" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Invoicy | Automate Invoices & Get Paid Faster" />
+  <meta name="twitter:description" content="Generate professional PDF invoices, set up automated email and WhatsApp payment reminders, and stop chasing clients." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- JSON-LD: SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Invoicy",
+    "description": "Automated invoice generator for Indian freelancers and small businesses. Create GST-ready PDFs, send WhatsApp and email reminders, track payments.",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "offers": [
+      { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "INR" },
+      { "@type": "Offer", "name": "Pro", "price": "499", "priceCurrency": "INR" }
+    ],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "ratingCount": "318"
+    }
+  }
+  </script>
+
+  <!-- JSON-LD: FAQ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      { "@type": "Question", "name": "Can I send WhatsApp reminders?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Invoicy generates 1-click WhatsApp share links with a pre-filled, polite reminder message and the invoice attached as a secure link." } },
+      { "@type": "Question", "name": "Is my client data safe?", "acceptedAnswer": { "@type": "Answer", "text": "We use bank-level AES-256 encryption at rest, TLS 1.3 in transit, and audited access controls. Your data is never sold or shared." } },
+      { "@type": "Question", "name": "Can I add GST details?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Invoicy fully supports Indian tax formats — CGST, SGST, IGST, HSN/SAC codes, place of supply, and reverse charge invoices." } },
+      { "@type": "Question", "name": "Do reminders feel automated and pushy?", "acceptedAnswer": { "@type": "Answer", "text": "No. Our default templates are written like a human would write them — polite, professional, and appropriately firm only when an invoice is overdue." } },
+      { "@type": "Question", "name": "Can I set up recurring invoices?", "acceptedAnswer": { "@type": "Answer", "text": "Recurring billing is available on the Pro plan. Set the cadence (weekly, monthly, quarterly), add an optional end date, and Invoicy handles the rest." } },
+      { "@type": "Question", "name": "What happens to my invoices if I cancel?", "acceptedAnswer": { "@type": "Answer", "text": "You can export every invoice as a PDF or CSV at any time, even after canceling. Your data is yours." } }
+    ]
+  }
+  </script>
+
+  <style>
+    /* ============ Reset & Base ============ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--bg);
+      overflow-x: hidden;
+    }
+    img, svg { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    ul { list-style: none; }
+
+    /* ============ Design System ============ */
+    :root {
+      /* Colors */
+      --indigo-50: #EEF2FF;
+      --indigo-100: #E0E7FF;
+      --indigo-500: #6366F1;
+      --indigo-600: #4F46E5;
+      --indigo-700: #4338CA;
+      --indigo-900: #312E81;
+
+      --emerald-50: #ECFDF5;
+      --emerald-500: #10B981;
+      --emerald-600: #059669;
+
+      --rose-50: #FFF1F2;
+      --rose-500: #F43F5E;
+      --rose-600: #E11D48;
+      --rose-700: #BE123C;
+
+      --amber-50: #FFFBEB;
+      --amber-500: #F59E0B;
+
+      --slate-50: #F8FAFC;
+      --slate-100: #F1F5F9;
+      --slate-200: #E2E8F0;
+      --slate-300: #CBD5E1;
+      --slate-400: #94A3B8;
+      --slate-500: #64748B;
+      --slate-600: #475569;
+      --slate-700: #334155;
+      --slate-800: #1E293B;
+      --slate-900: #0F172A;
+
+      --bg: #FFFFFF;
+      --bg-soft: #F8FAFC;
+      --text: #0F172A;
+      --text-muted: #475569;
+      --text-subtle: #64748B;
+      --border: #E2E8F0;
+      --border-soft: #F1F5F9;
+
+      /* Typography */
+      --font-display: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+      /* Shadows */
+      --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+      --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.07);
+      --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.08);
+      --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.10), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
+      --shadow-2xl: 0 25px 50px -12px rgba(15, 23, 42, 0.20);
+      --shadow-glow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+      --shadow-cta: 0 10px 30px -8px rgba(79, 70, 229, 0.55), 0 4px 12px -4px rgba(79, 70, 229, 0.4);
+
+      /* Radii */
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-xl: 18px;
+      --radius-2xl: 24px;
+      --radius-full: 9999px;
+
+      /* Layout */
+      --container: 1200px;
+      --container-narrow: 960px;
+    }
+
+    /* ============ Typography Scale ============ */
+    h1, h2, h3, h4 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: var(--slate-900);
+      line-height: 1.1;
+    }
+    h1 { font-size: clamp(2.4rem, 5.2vw, 4rem); letter-spacing: -0.03em; }
+    h2 { font-size: clamp(2rem, 3.6vw, 3rem); letter-spacing: -0.025em; }
+    h3 { font-size: clamp(1.25rem, 1.8vw, 1.5rem); letter-spacing: -0.015em; }
+    p { color: var(--text-muted); }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: var(--indigo-50);
+      color: var(--indigo-700);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--indigo-100);
+    }
+    .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--indigo-600); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.18); }
+
+    /* ============ Layout ============ */
+    .container { max-width: var(--container); margin: 0 auto; padding: 0 24px; }
+    .container-narrow { max-width: var(--container-narrow); margin: 0 auto; padding: 0 24px; }
+    section { padding: 96px 0; position: relative; }
+
+    /* ============ Buttons ============ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 22px;
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.005em;
+      border-radius: var(--radius-md);
+      transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--indigo-600);
+      color: #fff;
+      box-shadow: var(--shadow-cta);
+    }
+    .btn-primary:hover { background: var(--indigo-700); transform: translateY(-1px) scale(1.02); box-shadow: 0 14px 36px -8px rgba(79, 70, 229, 0.6), 0 6px 14px -4px rgba(79, 70, 229, 0.5); }
+    .btn-primary:active { transform: translateY(0) scale(1); }
+    .btn-secondary {
+      background: #fff;
+      color: var(--slate-900);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-xs);
+    }
+    .btn-secondary:hover { background: var(--slate-50); border-color: var(--slate-300); transform: translateY(-1px); }
+    .btn-ghost { color: var(--slate-700); padding: 10px 16px; }
+    .btn-ghost:hover { color: var(--slate-900); background: var(--slate-50); }
+    .btn-lg { padding: 16px 28px; font-size: 16px; }
+    .btn-arrow { transition: transform 0.2s ease; }
+    .btn:hover .btn-arrow { transform: translateX(3px); }
+
+    /* ============ Header / Nav ============ */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: saturate(180%) blur(14px);
+      -webkit-backdrop-filter: saturate(180%) blur(14px);
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+    .nav.scrolled { border-bottom-color: var(--border); background: rgba(255, 255, 255, 0.85); }
+    .nav-inner {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 700; font-size: 19px; color: var(--slate-900); letter-spacing: -0.02em; }
+    .brand-mark {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--indigo-600), var(--indigo-700));
+      border-radius: 8px;
+      display: grid; place-items: center;
+      box-shadow: 0 4px 12px -2px rgba(79, 70, 229, 0.45);
+      position: relative;
+    }
+    .brand-mark svg { width: 18px; height: 18px; color: white; }
+    .nav-links { display: flex; align-items: center; gap: 4px; }
+    .nav-links a { padding: 8px 14px; font-size: 14.5px; font-weight: 500; color: var(--slate-600); border-radius: 8px; transition: color 0.15s, background 0.15s; }
+    .nav-links a:hover { color: var(--slate-900); background: var(--slate-50); }
+    .nav-cta { display: flex; align-items: center; gap: 8px; }
+    .nav-cta .btn { padding: 10px 18px; font-size: 14px; }
+    .nav-toggle { display: none; }
+    @media (max-width: 860px) {
+      .nav-links, .nav-cta .btn-ghost { display: none; }
+      .nav-cta .btn { padding: 9px 14px; font-size: 13.5px; }
+    }
+
+    /* ============ HERO ============ */
+    .hero {
+      padding: 80px 0 100px;
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse 60% 50% at 90% 0%, rgba(99, 102, 241, 0.10), transparent 60%),
+        radial-gradient(ellipse 50% 40% at 0% 30%, rgba(16, 185, 129, 0.06), transparent 60%);
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+      gap: 64px;
+      align-items: center;
+    }
+    .hero-content { animation: fadeUp 0.7s 0.05s ease-out both; }
+    .hero h1 {
+      margin-top: 22px;
+      background: linear-gradient(180deg, var(--slate-900) 0%, var(--slate-700) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero h1 .accent {
+      background: linear-gradient(135deg, var(--indigo-600), var(--indigo-500));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      position: relative;
+    }
+    .hero-sub {
+      margin-top: 20px;
+      font-size: clamp(17px, 1.4vw, 19px);
+      line-height: 1.55;
+      color: var(--text-muted);
+      max-width: 560px;
+    }
+    .hero-actions {
+      margin-top: 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .hero-meta {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      color: var(--text-subtle);
+      font-size: 14px;
+    }
+    .hero-meta-item { display: inline-flex; align-items: center; gap: 6px; }
+    .hero-meta-item svg { width: 14px; height: 14px; color: var(--emerald-500); }
+    .hero-meta .sep { width: 3px; height: 3px; border-radius: 50%; background: var(--slate-300); }
+
+    /* ============ Hero Visual / Magic Animation ============ */
+    .hero-visual {
+      position: relative;
+      animation: fadeInRight 0.8s 0.15s ease-out both;
+      perspective: 1400px;
+    }
+    .hero-stage {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1.05 / 1;
+      max-width: 580px;
+      margin-left: auto;
+    }
+    .invoice-card {
+      position: absolute;
+      inset: 0 18% 14% 0;
+      background: #fff;
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow-2xl), 0 0 0 1px rgba(15, 23, 42, 0.06);
+      overflow: hidden;
+      transform: rotate(-2deg) translateZ(0);
+      animation: invoiceLifecycle 9s ease-in-out infinite;
+    }
+    .invoice-header {
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .invoice-brand { display: flex; align-items: center; gap: 9px; font-family: var(--font-display); font-weight: 700; color: var(--slate-900); font-size: 14px; }
+    .invoice-brand-mark { width: 24px; height: 24px; background: linear-gradient(135deg, var(--indigo-600), var(--indigo-700)); border-radius: 6px; }
+    .invoice-status {
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border-radius: var(--radius-full);
+      transition: all 0.4s ease;
+    }
+    .invoice-status.unpaid { background: var(--amber-50); color: var(--amber-500); border: 1px solid #FEF3C7; }
+    .invoice-status.overdue { background: var(--rose-50); color: var(--rose-600); border: 1px solid #FECDD3; animation: pulse 1.4s ease-in-out infinite; }
+    .invoice-status.paid { background: var(--emerald-50); color: var(--emerald-600); border: 1px solid #A7F3D0; }
+    .invoice-body { padding: 22px; }
+    .invoice-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0;
+      font-size: 13px;
+      border-bottom: 1px dashed var(--border-soft);
+    }
+    .invoice-row:last-child { border-bottom: none; }
+    .invoice-row .label { color: var(--text-subtle); }
+    .invoice-row .value { color: var(--slate-800); font-weight: 600; }
+    .invoice-amount-block {
+      margin-top: 16px;
+      padding: 16px;
+      background: var(--slate-50);
+      border-radius: var(--radius-lg);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .invoice-amount-block .l { font-size: 12px; color: var(--text-subtle); text-transform: uppercase; letter-spacing: 0.05em; }
+    .invoice-amount-block .v { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: var(--slate-900); }
+
+    /* Paid stamp overlay */
+    .paid-stamp {
+      position: absolute;
+      top: 38%;
+      right: 12%;
+      transform: rotate(-12deg) scale(0);
+      padding: 12px 22px;
+      border: 4px solid var(--emerald-500);
+      color: var(--emerald-500);
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: 0.1em;
+      border-radius: 8px;
+      pointer-events: none;
+      opacity: 0;
+      animation: paidStamp 9s ease-in-out infinite;
+    }
+
+    /* Reminder email card (right side) */
+    .reminder-card {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 62%;
+      background: #fff;
+      border-radius: var(--radius-xl);
+      padding: 16px;
+      box-shadow: var(--shadow-xl), 0 0 0 1px rgba(15, 23, 42, 0.05);
+      transform: translateY(20px);
+      opacity: 0;
+      animation: reminderPop 9s ease-in-out infinite;
+    }
+    .reminder-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .reminder-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--indigo-50), var(--indigo-100));
+      display: grid; place-items: center;
+      color: var(--indigo-600);
+    }
+    .reminder-icon svg { width: 18px; height: 18px; }
+    .reminder-title { font-size: 13px; font-weight: 600; color: var(--slate-900); }
+    .reminder-meta { font-size: 11px; color: var(--text-subtle); }
+    .reminder-body { font-size: 12.5px; line-height: 1.55; color: var(--slate-700); }
+    .reminder-body b { color: var(--slate-900); }
+
+    /* Floating notification (Payment Received) */
+    .notif-card {
+      position: absolute;
+      top: 12%;
+      left: -8%;
+      background: #fff;
+      border-radius: var(--radius-lg);
+      padding: 12px 16px;
+      box-shadow: var(--shadow-xl), 0 0 0 1px rgba(15, 23, 42, 0.05);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transform: translateX(-20px) scale(0.92);
+      opacity: 0;
+      animation: notifSlide 9s ease-in-out infinite;
+    }
+    .notif-icon {
+      width: 32px; height: 32px;
+      background: var(--emerald-50);
+      border-radius: 8px;
+      display: grid; place-items: center;
+      color: var(--emerald-600);
+    }
+    .notif-icon svg { width: 16px; height: 16px; }
+    .notif-text .l1 { font-size: 12px; font-weight: 600; color: var(--slate-900); white-space: nowrap; }
+    .notif-text .l2 { font-size: 11px; color: var(--text-subtle); }
+
+    /* Money flying particles */
+    .particle {
+      position: absolute;
+      font-size: 18px;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .particle-1 { top: 50%; right: 20%; animation: particle 9s ease-out infinite; }
+    .particle-2 { top: 55%; right: 30%; animation: particle 9s 0.3s ease-out infinite; }
+    .particle-3 { top: 45%; right: 25%; animation: particle 9s 0.6s ease-out infinite; }
+
+    /* ============ Animations ============ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInRight {
+      from { opacity: 0; transform: translateX(40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.65; }
+    }
+    @keyframes invoiceLifecycle {
+      0%, 18% { box-shadow: var(--shadow-2xl), 0 0 0 1px rgba(15, 23, 42, 0.06); }
+      30%, 55% { box-shadow: var(--shadow-2xl), 0 0 0 2px rgba(225, 29, 72, 0.45), 0 0 60px -10px rgba(225, 29, 72, 0.4); }
+      70%, 100% { box-shadow: var(--shadow-2xl), 0 0 0 2px rgba(16, 185, 129, 0.45), 0 0 60px -10px rgba(16, 185, 129, 0.4); }
+    }
+    @keyframes reminderPop {
+      0%, 22% { opacity: 0; transform: translateY(20px) scale(0.94); }
+      30%, 55% { opacity: 1; transform: translateY(0) scale(1); }
+      65%, 100% { opacity: 0.4; transform: translateY(10px) scale(0.97); }
+    }
+    @keyframes notifSlide {
+      0%, 60% { opacity: 0; transform: translateX(-20px) scale(0.92); }
+      70%, 92% { opacity: 1; transform: translateX(0) scale(1); }
+      96%, 100% { opacity: 0; transform: translateX(-10px) scale(0.95); }
+    }
+    @keyframes paidStamp {
+      0%, 65% { opacity: 0; transform: rotate(-12deg) scale(0); }
+      72%, 92% { opacity: 1; transform: rotate(-12deg) scale(1); }
+      96%, 100% { opacity: 0.7; transform: rotate(-12deg) scale(1); }
+    }
+    @keyframes particle {
+      0%, 60% { opacity: 0; transform: translate(0, 0) scale(0.5); }
+      70% { opacity: 1; transform: translate(-15px, -25px) scale(1); }
+      85% { opacity: 1; transform: translate(-40px, -55px) scale(1.1); }
+      100% { opacity: 0; transform: translate(-70px, -90px) scale(0.7); }
+    }
+
+    /* Status-text swapper */
+    .status-cycle .label-unpaid,
+    .status-cycle .label-overdue,
+    .status-cycle .label-paid { display: none; }
+    .status-cycle .label-unpaid { display: inline; }
+    .invoice-card { /* trigger via animation timing using filter on status */ }
+
+    /* Use multiple status pills layered with timed opacity */
+    .invoice-status-stack { position: relative; min-width: 70px; height: 22px; }
+    .invoice-status-stack .invoice-status {
+      position: absolute; right: 0; top: 0; opacity: 0;
+    }
+    .invoice-status-stack .unpaid { animation: statusUnpaid 9s ease-in-out infinite; }
+    .invoice-status-stack .overdue { animation: statusOverdue 9s ease-in-out infinite; }
+    .invoice-status-stack .paid { animation: statusPaid 9s ease-in-out infinite; }
+    @keyframes statusUnpaid { 0%, 22% { opacity: 1; } 26%, 100% { opacity: 0; } }
+    @keyframes statusOverdue { 0%, 26% { opacity: 0; } 30%, 65% { opacity: 1; } 70%, 100% { opacity: 0; } }
+    @keyframes statusPaid { 0%, 70% { opacity: 0; } 75%, 100% { opacity: 1; } }
+
+    /* ============ Logos / Marquee ============ */
+    .social-band {
+      padding: 56px 0;
+      border-top: 1px solid var(--border-soft);
+      border-bottom: 1px solid var(--border-soft);
+      background: linear-gradient(180deg, #fff 0%, var(--bg-soft) 100%);
+    }
+    .social-headline {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-subtle);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+    .social-headline strong { color: var(--slate-900); font-weight: 700; }
+    .social-bigline {
+      text-align: center;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: clamp(22px, 2.5vw, 32px);
+      color: var(--slate-900);
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .social-bigline .accent {
+      background: linear-gradient(135deg, var(--indigo-600), var(--emerald-600));
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .marquee {
+      overflow: hidden;
+      mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+      margin-top: 28px;
+    }
+    .marquee-track {
+      display: flex;
+      gap: 24px;
+      animation: marquee 38s linear infinite;
+      width: max-content;
+    }
+    .marquee:hover .marquee-track { animation-play-state: paused; }
+    .quote-card {
+      flex-shrink: 0;
+      width: 360px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 20px 22px;
+      box-shadow: var(--shadow-xs);
+    }
+    .quote-text { font-size: 14.5px; line-height: 1.55; color: var(--slate-700); }
+    .quote-meta { margin-top: 14px; display: flex; align-items: center; gap: 10px; }
+    .avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: grid; place-items: center;
+      font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #fff;
+      flex-shrink: 0;
+    }
+    .avatar.bg1 { background: linear-gradient(135deg, #4F46E5, #7C3AED); }
+    .avatar.bg2 { background: linear-gradient(135deg, #10B981, #059669); }
+    .avatar.bg3 { background: linear-gradient(135deg, #F43F5E, #E11D48); }
+    .avatar.bg4 { background: linear-gradient(135deg, #F59E0B, #D97706); }
+    .avatar.bg5 { background: linear-gradient(135deg, #06B6D4, #0891B2); }
+    .avatar.bg6 { background: linear-gradient(135deg, #8B5CF6, #6D28D9); }
+    .quote-name { font-size: 13.5px; font-weight: 600; color: var(--slate-900); }
+    .quote-role { font-size: 12px; color: var(--text-subtle); }
+    .stars { display: flex; gap: 2px; margin-bottom: 10px; }
+    .stars svg { width: 14px; height: 14px; color: var(--amber-500); fill: currentColor; }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ============ Problem Section ============ */
+    .problem {
+      background: var(--slate-900);
+      color: #fff;
+      padding: 110px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .problem::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 50% 50% at 80% 50%, rgba(99, 102, 241, 0.18), transparent 60%),
+        radial-gradient(ellipse 40% 40% at 20% 60%, rgba(225, 29, 72, 0.10), transparent 60%);
+      pointer-events: none;
+    }
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      position: relative;
+    }
+    .problem h2 { color: #fff; }
+    .problem h2 .strike { text-decoration: line-through; text-decoration-color: var(--rose-500); text-decoration-thickness: 4px; opacity: 0.7; }
+    .problem p { color: var(--slate-300); font-size: 17px; margin-top: 20px; max-width: 520px; }
+    .problem-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 36px; }
+    .problem-stat { padding: 18px 0; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+    .problem-stat .num { font-family: var(--font-display); font-weight: 700; font-size: 28px; color: #fff; letter-spacing: -0.02em; }
+    .problem-stat .lbl { font-size: 12.5px; color: var(--slate-400); margin-top: 4px; }
+
+    .chat-mockup {
+      background: #1E293B;
+      border-radius: var(--radius-2xl);
+      padding: 22px;
+      box-shadow: var(--shadow-2xl);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      max-width: 460px;
+      margin-left: auto;
+    }
+    .chat-head {
+      display: flex; align-items: center; gap: 10px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      margin-bottom: 16px;
+    }
+    .chat-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #475569, #334155); }
+    .chat-name { font-size: 14px; font-weight: 600; color: #fff; }
+    .chat-status { font-size: 12px; color: var(--slate-400); }
+    .chat-bubble {
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 14px;
+      max-width: 85%;
+      margin-bottom: 8px;
+      line-height: 1.45;
+    }
+    .chat-bubble.sent { background: var(--indigo-600); color: #fff; margin-left: auto; border-bottom-right-radius: 4px; }
+    .chat-bubble.received { background: #334155; color: var(--slate-200); border-bottom-left-radius: 4px; }
+    .chat-bubble .time { display: block; font-size: 10px; opacity: 0.7; margin-top: 4px; }
+    .chat-typing {
+      display: inline-flex; gap: 3px; padding: 12px 14px;
+      background: #334155; border-radius: 14px; border-bottom-left-radius: 4px;
+    }
+    .chat-typing span { width: 6px; height: 6px; border-radius: 50%; background: var(--slate-400); animation: typing 1.4s infinite; }
+    .chat-typing span:nth-child(2) { animation-delay: 0.2s; }
+    .chat-typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typing { 0%, 60%, 100% { opacity: 0.3; } 30% { opacity: 1; } }
+
+    /* ============ Features Section ============ */
+    .features { padding: 110px 0; }
+    .section-head { text-align: center; max-width: 720px; margin: 0 auto 64px; }
+    .section-head h2 { margin-top: 16px; }
+    .section-head p { margin-top: 16px; font-size: 17px; }
+
+    .feature-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+      margin-bottom: 120px;
+    }
+    .feature-row:last-child { margin-bottom: 0; }
+    .feature-row.reverse .feature-text { order: 2; }
+    .feature-row.reverse .feature-visual { order: 1; }
+    .feature-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 11px;
+      font-size: 12.5px; font-weight: 600;
+      border-radius: var(--radius-full);
+      letter-spacing: 0.02em;
+    }
+    .feature-tag.indigo { background: var(--indigo-50); color: var(--indigo-700); }
+    .feature-tag.emerald { background: var(--emerald-50); color: var(--emerald-600); }
+    .feature-tag.rose { background: var(--rose-50); color: var(--rose-600); }
+    .feature-text h3 { margin-top: 16px; font-size: clamp(1.6rem, 2.4vw, 2.1rem); line-height: 1.15; }
+    .feature-text > p { margin-top: 16px; font-size: 16.5px; line-height: 1.6; max-width: 480px; }
+    .feature-bullets { margin-top: 24px; display: flex; flex-direction: column; gap: 14px; }
+    .feature-bullet { display: flex; gap: 14px; align-items: flex-start; font-size: 15px; color: var(--slate-700); transition: transform 0.18s ease; }
+    .feature-bullet:hover { transform: translateX(3px); }
+    .b-ico {
+      flex-shrink: 0;
+      width: 32px; height: 32px;
+      border-radius: 10px;
+      display: grid; place-items: center;
+      margin-top: -1px;
+    }
+    .b-ico svg { width: 16px; height: 16px; }
+    .b-ico.indigo { background: var(--indigo-50); color: var(--indigo-600); border: 1px solid var(--indigo-100); box-shadow: inset 0 1px 0 rgba(255,255,255,0.6); }
+    .b-ico.emerald { background: var(--emerald-50); color: var(--emerald-600); border: 1px solid #A7F3D0; box-shadow: inset 0 1px 0 rgba(255,255,255,0.6); }
+    .b-ico.rose { background: var(--rose-50); color: var(--rose-600); border: 1px solid #FECDD3; box-shadow: inset 0 1px 0 rgba(255,255,255,0.6); }
+
+    /* Feature Visual: Invoice editor */
+    .editor-mockup {
+      background: #fff;
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow-2xl), 0 0 0 1px rgba(15, 23, 42, 0.05);
+      overflow: hidden;
+      max-width: 540px;
+      margin: 0 auto;
+    }
+    .editor-tabs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--slate-50);
+      border-bottom: 1px solid var(--border);
+    }
+    .editor-tabs .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--slate-300); }
+    .editor-tabs .dot:nth-child(1) { background: #FB7185; }
+    .editor-tabs .dot:nth-child(2) { background: #FBBF24; }
+    .editor-tabs .dot:nth-child(3) { background: #34D399; }
+    .editor-tabs .url { margin-left: 8px; padding: 4px 12px; background: #fff; border: 1px solid var(--border); border-radius: 6px; font-size: 11px; color: var(--text-subtle); font-family: ui-monospace, Menlo, monospace; }
+    .editor-body { padding: 24px; }
+    .editor-row { display: flex; gap: 12px; margin-bottom: 14px; }
+    .editor-field { flex: 1; }
+    .editor-field label { display: block; font-size: 11px; font-weight: 600; color: var(--text-subtle); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+    .editor-field .input {
+      padding: 10px 12px;
+      background: var(--slate-50);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      color: var(--slate-800);
+    }
+    .editor-field.focused .input {
+      background: #fff;
+      border-color: var(--indigo-500);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+    }
+    .editor-table {
+      margin-top: 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    .editor-table-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      padding: 9px 12px;
+      font-size: 12.5px;
+      border-bottom: 1px solid var(--border);
+    }
+    .editor-table-row:last-child { border-bottom: none; }
+    .editor-table-row.head { background: var(--slate-50); font-weight: 600; color: var(--text-subtle); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .editor-table-row .right { text-align: right; }
+    .editor-table-row .total { color: var(--slate-900); font-weight: 600; }
+    .editor-share {
+      display: flex; gap: 8px; margin-top: 18px;
+    }
+    .share-btn {
+      flex: 1;
+      padding: 10px; font-size: 12.5px; font-weight: 600;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .share-btn.email { background: var(--indigo-600); color: #fff; }
+    .share-btn.whatsapp { background: var(--emerald-500); color: #fff; }
+    .share-btn.pdf { background: var(--slate-50); color: var(--slate-700); border: 1px solid var(--border); }
+    .share-btn svg { width: 14px; height: 14px; }
+
+    /* Feature Visual: Reminder timeline */
+    .reminder-mockup {
+      background: #fff;
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow-2xl), 0 0 0 1px rgba(15, 23, 42, 0.05);
+      padding: 28px;
+      max-width: 540px;
+      margin: 0 auto;
+    }
+    .reminder-mock-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .reminder-mock-title { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--slate-900); }
+    .reminder-mock-toggle {
+      display: flex; align-items: center; gap: 8px;
+      padding: 5px 10px;
+      background: var(--emerald-50);
+      color: var(--emerald-600);
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+      border: 1px solid #A7F3D0;
+    }
+    .toggle-pill {
+      width: 28px; height: 16px; background: var(--emerald-500); border-radius: 999px; position: relative;
+    }
+    .toggle-pill::after {
+      content: ''; position: absolute; right: 2px; top: 2px;
+      width: 12px; height: 12px; background: #fff; border-radius: 50%;
+    }
+
+    .timeline { position: relative; padding-left: 30px; }
+    .timeline::before {
+      content: ''; position: absolute; left: 11px; top: 8px; bottom: 8px; width: 2px;
+      background: linear-gradient(180deg, var(--emerald-500), var(--amber-500), var(--rose-500));
+    }
+    .timeline-item {
+      position: relative;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      background: var(--slate-50);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+    .timeline-item:last-child { margin-bottom: 0; }
+    .timeline-dot {
+      position: absolute;
+      left: -25px;
+      top: 18px;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      box-shadow: 0 0 0 2px currentColor;
+    }
+    .timeline-dot.green { color: var(--emerald-500); background: var(--emerald-500); }
+    .timeline-dot.amber { color: var(--amber-500); background: var(--amber-500); }
+    .timeline-dot.rose { color: var(--rose-500); background: var(--rose-500); }
+    .timeline-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .timeline-title { font-size: 13px; font-weight: 600; color: var(--slate-900); }
+    .timeline-when { font-size: 11.5px; color: var(--text-subtle); padding: 2px 8px; background: #fff; border-radius: 6px; border: 1px solid var(--border); }
+    .timeline-msg { font-size: 12.5px; color: var(--text-muted); line-height: 1.5; }
+    .timeline-channels { display: flex; gap: 6px; margin-top: 8px; }
+    .channel-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 8px;
+      font-size: 10.5px; font-weight: 600;
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--slate-700);
+    }
+    .channel-chip svg { width: 10px; height: 10px; }
+
+    /* Feature Visual: Dashboard */
+    .dashboard-mockup {
+      background: #fff;
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow-2xl), 0 0 0 1px rgba(15, 23, 42, 0.05);
+      padding: 24px;
+      max-width: 540px;
+      margin: 0 auto;
+    }
+    .dash-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .dash-title { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--slate-900); }
+    .dash-period { font-size: 11.5px; padding: 4px 10px; background: var(--slate-50); color: var(--text-subtle); border-radius: 6px; border: 1px solid var(--border); }
+    .dash-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+    .dash-stat { padding: 12px; background: var(--slate-50); border-radius: var(--radius-md); border: 1px solid var(--border); }
+    .dash-stat .lbl { font-size: 10.5px; font-weight: 600; color: var(--text-subtle); text-transform: uppercase; letter-spacing: 0.04em; }
+    .dash-stat .val { font-family: var(--font-display); font-weight: 700; font-size: 18px; color: var(--slate-900); margin-top: 4px; letter-spacing: -0.02em; }
+    .dash-stat .delta { font-size: 11px; margin-top: 4px; display: inline-flex; align-items: center; gap: 3px; }
+    .delta.up { color: var(--emerald-600); }
+    .delta.down { color: var(--rose-600); }
+
+    .dash-chart { height: 130px; margin-bottom: 18px; position: relative; }
+    .dash-list { display: flex; flex-direction: column; gap: 8px; }
+    .dash-item {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 12px;
+      background: var(--slate-50);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      font-size: 12.5px;
+    }
+    .dash-item .who { color: var(--slate-900); font-weight: 600; }
+    .dash-item .amt { font-weight: 600; color: var(--slate-900); }
+    .dash-badge {
+      padding: 3px 9px;
+      font-size: 10.5px; font-weight: 700;
+      letter-spacing: 0.03em;
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+    }
+    .dash-badge.paid { background: var(--emerald-50); color: var(--emerald-600); border: 1px solid #A7F3D0; }
+    .dash-badge.due { background: var(--amber-50); color: var(--amber-500); border: 1px solid #FEF3C7; }
+    .dash-badge.overdue { background: var(--rose-50); color: var(--rose-600); border: 1px solid #FECDD3; }
+
+    /* ============ How It Works ============ */
+    .how {
+      background: var(--bg-soft);
+      padding: 110px 0;
+    }
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 56px;
+    }
+    .how-card {
+      position: relative;
+      background: #fff;
+      border-radius: var(--radius-2xl);
+      padding: 32px 28px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .how-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .how-step-num {
+      display: inline-flex;
+      align-items: center; justify-content: center;
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--indigo-600), var(--indigo-500));
+      color: #fff;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 16px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 6px 16px -4px rgba(79, 70, 229, 0.5);
+      margin-bottom: 20px;
+    }
+    .how-card h3 { font-size: 1.3rem; }
+    .how-card > p { font-size: 14.5px; margin-top: 10px; }
+    .how-mini {
+      margin-top: 22px;
+      padding: 16px;
+      background: var(--slate-50);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-soft);
+    }
+    .how-input-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px;
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 12px; color: var(--slate-700);
+      margin-bottom: 6px;
+    }
+    .how-input-row .l { color: var(--text-subtle); font-size: 11px; flex-shrink: 0; }
+    .how-input-row .v { font-weight: 600; color: var(--slate-900); }
+
+    .how-calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .cal-cell {
+      aspect-ratio: 1;
+      display: grid; place-items: center;
+      font-size: 10px; font-weight: 600;
+      background: #fff; border-radius: 4px; color: var(--text-subtle);
+      border: 1px solid var(--border-soft);
+      position: relative;
+    }
+    .cal-cell.muted { opacity: 0.4; }
+    .cal-cell.green { background: var(--emerald-50); color: var(--emerald-600); border-color: var(--emerald-500); }
+    .cal-cell.amber { background: var(--amber-50); color: var(--amber-500); border-color: var(--amber-500); }
+    .cal-cell.rose { background: var(--rose-50); color: var(--rose-600); border-color: var(--rose-500); }
+    .cal-cell.green::after, .cal-cell.amber::after, .cal-cell.rose::after {
+      content: ''; position: absolute; bottom: 2px; width: 4px; height: 4px; border-radius: 50%; background: currentColor;
+    }
+
+    .how-graph { height: 100px; }
+    .how-graph-foot { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--text-subtle); margin-top: 6px; }
+
+    /* ============ Pricing ============ */
+    .pricing { padding: 110px 0; }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      max-width: 880px;
+      margin: 56px auto 0;
+    }
+    .price-card {
+      position: relative;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-2xl);
+      padding: 36px 32px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s;
+    }
+    .price-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-2xl); }
+    .price-card.featured {
+      border-color: var(--indigo-600);
+      box-shadow: var(--shadow-xl), 0 0 0 1px var(--indigo-600);
+      background: linear-gradient(180deg, #fff 0%, #FAFBFF 100%);
+    }
+    .price-card.featured:hover { box-shadow: var(--shadow-2xl), 0 0 0 2px var(--indigo-600); }
+    .price-ribbon {
+      position: absolute;
+      top: -12px; left: 50%; transform: translateX(-50%);
+      padding: 6px 14px;
+      background: linear-gradient(135deg, var(--indigo-600), var(--indigo-700));
+      color: #fff;
+      font-size: 11.5px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      border-radius: var(--radius-full);
+      box-shadow: 0 6px 16px -4px rgba(79, 70, 229, 0.5);
+    }
+    .price-name { font-family: var(--font-display); font-weight: 700; font-size: 18px; color: var(--slate-900); }
+    .price-tag-line { font-size: 13.5px; color: var(--text-subtle); margin-top: 4px; }
+    .price-amount { display: flex; align-items: baseline; gap: 6px; margin-top: 18px; }
+    .price-amount .v { font-family: var(--font-display); font-weight: 800; font-size: 48px; letter-spacing: -0.03em; color: var(--slate-900); }
+    .price-amount .u { font-size: 14px; color: var(--text-subtle); }
+    .price-amount .currency { font-family: var(--font-display); font-weight: 700; font-size: 24px; color: var(--slate-900); }
+    .price-list { margin: 24px 0; display: flex; flex-direction: column; gap: 14px; }
+    .price-list li { display: flex; gap: 14px; align-items: flex-start; font-size: 14.5px; color: var(--slate-700); }
+    .price-list li .p-dot {
+      flex-shrink: 0;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      margin-top: 9px;
+      background: var(--slate-400);
+      box-shadow: 0 0 0 4px rgba(148, 163, 184, 0.14);
+    }
+    .price-card.featured .price-list .p-dot {
+      background: var(--indigo-600);
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.18);
+    }
+    .price-list li.muted { color: var(--text-subtle); }
+    .price-list li.muted .p-dash {
+      flex-shrink: 0;
+      width: 14px; height: 2px;
+      border-radius: 1px;
+      margin-top: 12px;
+      background: var(--slate-300);
+    }
+    .price-cta { width: 100%; }
+
+    /* ============ FAQ ============ */
+    .faq {
+      padding: 110px 0;
+      background: var(--bg-soft);
+    }
+    .faq-list { max-width: 780px; margin: 56px auto 0; }
+    .faq-item {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+    .faq-item:hover { box-shadow: var(--shadow-sm); }
+    .faq-item[open] { box-shadow: var(--shadow-md); border-color: var(--indigo-100); }
+    .faq-q {
+      padding: 18px 22px;
+      list-style: none;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 15.5px; font-weight: 600; color: var(--slate-900);
+      gap: 16px;
+    }
+    .faq-q::-webkit-details-marker { display: none; }
+    .faq-icon {
+      flex-shrink: 0;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--slate-50);
+      display: grid; place-items: center;
+      transition: transform 0.2s, background 0.2s;
+      color: var(--slate-700);
+    }
+    .faq-icon svg { width: 14px; height: 14px; }
+    .faq-item[open] .faq-icon { transform: rotate(45deg); background: var(--indigo-100); color: var(--indigo-700); }
+    .faq-a {
+      padding: 0 22px 20px;
+      font-size: 14.5px;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* ============ Final CTA ============ */
+    .final-cta { padding: 110px 0; }
+    .final-card {
+      background: linear-gradient(135deg, var(--indigo-700) 0%, var(--indigo-600) 50%, #6366F1 100%);
+      border-radius: var(--radius-2xl);
+      padding: 80px 56px;
+      text-align: center;
+      color: #fff;
+      box-shadow: var(--shadow-2xl);
+      position: relative;
+      overflow: hidden;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+    .final-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 60% at 0% 100%, rgba(255, 255, 255, 0.18), transparent 50%),
+        radial-gradient(ellipse 60% 60% at 100% 0%, rgba(255, 255, 255, 0.12), transparent 50%);
+      pointer-events: none;
+    }
+    .final-card h2 { color: #fff; max-width: 680px; margin: 0 auto; position: relative; }
+    .final-card p { color: rgba(255, 255, 255, 0.85); margin-top: 18px; font-size: 17px; max-width: 540px; margin-left: auto; margin-right: auto; position: relative; }
+    .final-card .btn { margin-top: 32px; position: relative; background: #fff; color: var(--indigo-700); box-shadow: 0 12px 32px -6px rgba(0, 0, 0, 0.3); }
+    .final-card .btn:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 16px 40px -6px rgba(0, 0, 0, 0.35); background: #fff; }
+    .final-card .meta-row { color: rgba(255, 255, 255, 0.8); margin-top: 18px; font-size: 13.5px; position: relative; }
+
+    /* ============ Footer ============ */
+    footer {
+      background: var(--slate-900);
+      color: var(--slate-400);
+      padding: 64px 0 32px;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+    }
+    .footer-brand { font-family: var(--font-display); font-weight: 700; color: #fff; font-size: 19px; display: flex; align-items: center; gap: 10px; }
+    .footer-tag { margin-top: 14px; font-size: 14px; color: var(--slate-400); max-width: 320px; line-height: 1.55; }
+    .footer-col h4 { color: #fff; font-size: 13px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 16px; font-family: var(--font-body); }
+    .footer-col ul { display: flex; flex-direction: column; gap: 10px; }
+    .footer-col a { color: var(--slate-400); font-size: 14px; transition: color 0.15s; }
+    .footer-col a:hover { color: #fff; }
+    .footer-bottom {
+      margin-top: 56px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 13px;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+    .footer-socials { display: flex; gap: 8px; }
+    .footer-socials a {
+      width: 34px; height: 34px;
+      display: grid; place-items: center;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      transition: background 0.15s;
+    }
+    .footer-socials a:hover { background: rgba(255, 255, 255, 0.1); }
+    .footer-socials svg { width: 16px; height: 16px; }
+
+    /* ============ Reveal-on-scroll ============ */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease-out, transform 0.7s ease-out; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    .reveal-stagger > * { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+    .reveal-stagger.in > *:nth-child(1) { opacity: 1; transform: none; transition-delay: 0.05s; }
+    .reveal-stagger.in > *:nth-child(2) { opacity: 1; transform: none; transition-delay: 0.15s; }
+    .reveal-stagger.in > *:nth-child(3) { opacity: 1; transform: none; transition-delay: 0.25s; }
+    .reveal-stagger.in > *:nth-child(4) { opacity: 1; transform: none; transition-delay: 0.35s; }
+
+    /* ============ Reduced motion ============ */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .reveal, .reveal-stagger > * { opacity: 1 !important; transform: none !important; }
+    }
+
+    /* ============ Mobile ============ */
+    @media (max-width: 980px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 56px; }
+      .hero-stage { max-width: 480px; margin: 0 auto; }
+      .problem-grid { grid-template-columns: 1fr; gap: 40px; }
+      .feature-row { grid-template-columns: 1fr; gap: 40px; margin-bottom: 80px; }
+      .feature-row.reverse .feature-text { order: 1; }
+      .feature-row.reverse .feature-visual { order: 2; }
+      .how-grid { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; max-width: 460px; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+      .final-card { padding: 56px 32px; }
+    }
+    @media (max-width: 640px) {
+      section { padding: 72px 0; }
+      .hero { padding: 56px 0 80px; }
+      .container { padding: 0 20px; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .problem-stats { grid-template-columns: 1fr; }
+      .quote-card { width: 280px; padding: 18px; }
+      .editor-row { flex-direction: column; }
+      .dash-stats { grid-template-columns: 1fr 1fr; }
+      .editor-share { flex-direction: column; }
+      .nav-inner { padding: 12px 18px; }
+      .hero h1 { font-size: 2.2rem; }
+      .final-card { padding: 48px 24px; }
+      .price-card { padding: 28px 24px; }
+    }
+  </style>
+<style>
+.ha-img-placeholder{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;background:#f4f4f5;border:1px dashed #d4d4d8;border-radius:8px;color:#71717a;font-size:12px;font-family:system-ui,sans-serif;min-height:80px;padding:16px;box-sizing:border-box;animation:ha-img-pulse 1.5s ease-in-out infinite}
+.ha-img-placeholder.ha-failed{animation:none;opacity:.7}
+@keyframes ha-img-pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@media(prefers-color-scheme:dark){.ha-img-placeholder{background:#27272a;border-color:#3f3f46;color:#a1a1aa}}
+</style>
+</head>
+<body>
+  <!-- ============ HEADER ============ -->
+  <header class="nav" id="nav">
+    <div class="nav-inner">
+      <a class="brand" href="tOpF4wBtvQOyYwaxwJxgiQ.html#">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a2 2 0 0 0 2 2h4"/><path d="M5 8V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-3"/><path d="M2 13h10"/><path d="m9 16 3-3-3-3"/></svg>
+        </span>
+        Invoicy
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="tOpF4wBtvQOyYwaxwJxgiQ.html#features">Features</a>
+        <a href="tOpF4wBtvQOyYwaxwJxgiQ.html#how">How it works</a>
+        <a href="tOpF4wBtvQOyYwaxwJxgiQ.html#pricing">Pricing</a>
+        <a href="tOpF4wBtvQOyYwaxwJxgiQ.html#faq">FAQ</a>
+      </nav>
+      <div class="nav-cta">
+        <a href="tOpF4wBtvQOyYwaxwJxgiQ.html#" class="btn btn-ghost">Sign in</a>
+        <a href="tOpF4wBtvQOyYwaxwJxgiQ.html#cta" class="btn btn-primary" data-cta="nav">Start Free
+          <svg class="btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ HERO ============ -->
+    <section class="hero" aria-labelledby="hero-h1">
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <span class="eyebrow"><span class="dot"></span> Built for India · GST-ready · WhatsApp + Email</span>
+          <h1 id="hero-h1">Stop Chasing Clients.<br/><span class="accent">Start Getting Paid on Time.</span></h1>
+          <p class="hero-sub">Create professional invoices in seconds and let our smart automated reminders do the awkward follow-ups for you — over email, WhatsApp, or both.</p>
+          <div class="hero-actions">
+            <a href="tOpF4wBtvQOyYwaxwJxgiQ.html#cta" class="btn btn-primary btn-lg" data-cta="hero">Start Invoicing for Free
+              <svg class="btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+            <a href="tOpF4wBtvQOyYwaxwJxgiQ.html#how" class="btn btn-secondary btn-lg">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              See it in 60 seconds
+            </a>
+          </div>
+          <div class="hero-meta">
+            <span class="hero-meta-item">No credit card required</span>
+            <span class="sep"></span>
+            <span class="hero-meta-item">Setup in 2 minutes</span>
+            <span class="sep"></span>
+            <span class="hero-meta-item">Free forever plan</span>
+          </div>
+        </div>
+
+        <!-- Hero Visual: Looping "Magic" sequence -->
+        <div class="hero-visual" aria-hidden="true">
+          <div class="hero-stage">
+            <!-- Invoice Card -->
+            <div class="invoice-card">
+              <div class="invoice-header">
+                <div class="invoice-brand">
+                  <span class="invoice-brand-mark"></span>
+                  <span>Studio Apex</span>
+                </div>
+                <div class="invoice-status-stack">
+                  <span class="invoice-status unpaid">Pending</span>
+                  <span class="invoice-status overdue">Overdue</span>
+                  <span class="invoice-status paid">Paid</span>
+                </div>
+              </div>
+              <div class="invoice-body">
+                <div class="invoice-row"><span class="label">Invoice</span><span class="value">#INV-2026-0142</span></div>
+                <div class="invoice-row"><span class="label">Bill to</span><span class="value">Acme Pvt. Ltd.</span></div>
+                <div class="invoice-row"><span class="label">Issued</span><span class="value">Apr 18, 2026</span></div>
+                <div class="invoice-row"><span class="label">Due</span><span class="value">Apr 28, 2026</span></div>
+                <div class="invoice-amount-block">
+                  <div>
+                    <div class="l">Total Due</div>
+                    <div class="v">₹84,500</div>
+                  </div>
+                  <div style="text-align:right">
+                    <div class="l">CGST + SGST</div>
+                    <div style="font-size:13px;color:var(--text-subtle);font-weight:500;">incl. ₹12,889</div>
+                  </div>
+                </div>
+              </div>
+              <div class="paid-stamp">PAID</div>
+            </div>
+
+            <!-- Floating particles -->
+            <span class="particle particle-1">✉️</span>
+            <span class="particle particle-2">💸</span>
+            <span class="particle particle-3">✉️</span>
+
+            <!-- Reminder email pop -->
+            <div class="reminder-card">
+              <div class="reminder-head">
+                <div class="reminder-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+                </div>
+                <div>
+                  <div class="reminder-title">Reminder sent automatically</div>
+                  <div class="reminder-meta">to <a href="https://pub.hyperagent.com/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c4a6ada8a8adaaa384a5a7a9a1eaa7aba9">[email&#160;protected]</a> · just now</div>
+                </div>
+              </div>
+              <div class="reminder-body">
+                Hi Priya, just a friendly reminder that <b>invoice #INV-2026-0142 (₹84,500)</b> is due today. You can pay in 1 click here →
+              </div>
+            </div>
+
+            <!-- Payment Received notification -->
+            <div class="notif-card">
+              <div class="notif-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12"/><path d="M6 8h12"/><path d="m6 13 8.5 8"/><path d="M6 13h3a4.5 4.5 0 0 0 0-9"/></svg>
+              </div>
+              <div class="notif-text">
+                <div class="l1">Payment received · ₹84,500</div>
+                <div class="l2">From Acme Pvt. Ltd.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SOCIAL PROOF ============ -->
+    <section class="social-band" aria-labelledby="social-h">
+      <div class="container">
+        <h2 id="social-h" class="social-bigline">Trusted by freelancers and agencies to collect <span class="accent">₹50&nbsp;Million+</span> on time.</h2>
+        <p class="social-headline">Loved by indie consultants, design studios, dev agencies, and SMEs across India</p>
+      </div>
+      <div class="marquee">
+        <div class="marquee-track">
+          <!-- testimonial set 1 -->
+          <article class="quote-card">
+            <div class="stars" aria-label="5 out of 5">
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <p class="quote-text">"Invoicy saved me 3 hours a week of follow-ups. My average payment time dropped from 23 days to 6."</p>
+            <div class="quote-meta">
+              <div class="avatar bg1">RA</div>
+              <div><div class="quote-name">Rahul Agarwal</div><div class="quote-role">Web Developer · Bengaluru</div></div>
+            </div>
+          </article>
+
+          <article class="quote-card">
+            <div class="stars" aria-label="5 out of 5">
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <p class="quote-text">"The WhatsApp reminders changed everything. Clients actually open them — and pay."</p>
+            <div class="quote-meta">
+              <div class="avatar bg2">PK</div>
+              <div><div class="quote-name">Priyanka Kapoor</div><div class="quote-role">Founder, Visual Studio · Mumbai</div></div>
+            </div>
+          </article>
+
+          <article class="quote-card">
+            <div class="stars" aria-label="5 out of 5">
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <p class="quote-text">"GST-ready invoices in seconds, not 30 minutes in Word. My CA literally thanked me."</p>
+            <div class="quote-meta">
+              <div class="avatar bg3">AS</div>
+              <div><div class="quote-name">Aakash Sharma</div><div class="quote-role">Tax Consultant · Delhi</div></div>
+            </div>
+          </article>
+
+          <article class="quote-card">
+            <div class="stars" aria-label="5 out of 5">
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <p class="quote-text">"I don't dread sending invoices anymore. The recurring billing setup is brilliant."</p>
+            <div class="quote-meta">
+              <div class="avatar bg4">SD</div>
+              <div><div class="quote-name">Sneha Das</div><div class="quote-role">Content Strategist · Pune</div></div>
+            </div>
+          </article>
+
+          <article class="quote-card">
+            <div class="stars" aria-label="5 out of 5">
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <p class="quote-text">"Finally a tool that gets Indian businesses. CGST, SGST, HSN codes — all there. Zero hacks."</p>
+            <div class="quote-meta">
+              <div class="avatar bg5">VM</div>
+              <div><div class="quote-name">Vivek Menon</div><div class="quote-role">Agency Owner · Kochi</div></div>
+            </div>
+          </article>
+
+          <article class="quote-card">
+            <div class="stars" aria-label="5 out of 5">
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <p class="quote-text">"Onboarded my whole team in 10 minutes. The dashboard is genuinely beautiful."</p>
+            <div class="quote-meta">
+              <div class="avatar bg6">NJ</div>
+              <div><div class="quote-name">Nikhil Joshi</div><div class="quote-role">CEO, Pixelcraft Studios</div></div>
+            </div>
+          </article>
+
+          <!-- duplicate set for seamless loop -->
+          <article class="quote-card">
+            <div class="stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <p class="quote-text">"Invoicy saved me 3 hours a week of follow-ups. My average payment time dropped from 23 days to 6."</p>
+            <div class="quote-meta"><div class="avatar bg1">RA</div><div><div class="quote-name">Rahul Agarwal</div><div class="quote-role">Web Developer · Bengaluru</div></div></div>
+          </article>
+          <article class="quote-card">
+            <div class="stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <p class="quote-text">"The WhatsApp reminders changed everything. Clients actually open them — and pay."</p>
+            <div class="quote-meta"><div class="avatar bg2">PK</div><div><div class="quote-name">Priyanka Kapoor</div><div class="quote-role">Founder, Visual Studio · Mumbai</div></div></div>
+          </article>
+          <article class="quote-card">
+            <div class="stars"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+            <p class="quote-text">"GST-ready invoices in seconds, not 30 minutes in Word. My CA literally thanked me."</p>
+            <div class="quote-meta"><div class="avatar bg3">AS</div><div><div class="quote-name">Aakash Sharma</div><div class="quote-role">Tax Consultant · Delhi</div></div></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PROBLEM ============ -->
+    <section class="problem" aria-labelledby="problem-h">
+      <div class="container problem-grid">
+        <div class="reveal">
+          <span class="eyebrow" style="background:rgba(244,63,94,0.12); color:#FB7185; border-color:rgba(244,63,94,0.2);">
+            <span class="dot" style="background:#FB7185; box-shadow:0 0 0 3px rgba(244,63,94,0.25);"></span>
+            The Problem
+          </span>
+          <h2 id="problem-h">You do the work. You shouldn't have to <span class="strike">beg</span> for the money.</h2>
+          <p>Creating invoices manually is slow. Tracking who paid is a mess. And sending that "Hey, just checking in on the invoice…" message is the worst part of your job.</p>
+
+          <div class="problem-stats">
+            <div class="problem-stat"><div class="num">63%</div><div class="lbl">of freelancer invoices in India are paid late.</div></div>
+            <div class="problem-stat"><div class="num">5.5 hrs</div><div class="lbl">spent every week on admin & chasing.</div></div>
+            <div class="problem-stat"><div class="num">₹2.4L</div><div class="lbl">avg. annual cash-flow lost to late payments.</div></div>
+          </div>
+        </div>
+
+        <div class="chat-mockup reveal">
+          <div class="chat-head">
+            <div class="chat-avatar"></div>
+            <div>
+              <div class="chat-name">Acme Pvt. Ltd.</div>
+              <div class="chat-status">last seen 4 days ago</div>
+            </div>
+          </div>
+          <div class="chat-bubble sent">Hi! Just following up on Invoice #INV-1042. Could you confirm when payment will be processed? <span class="time">10:42 AM</span></div>
+          <div class="chat-bubble sent">Hey, sorry to bother again — circling back on this 🙏 <span class="time">2 days later</span></div>
+          <div class="chat-bubble sent">Hi, any update? It's been 3 weeks now. <span class="time">1 week later</span></div>
+          <div class="chat-typing"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FEATURES ============ -->
+    <section class="features" id="features" aria-labelledby="features-h">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow"><span class="dot"></span> The Solution</span>
+          <h2 id="features-h">One tool. Three superpowers.</h2>
+          <p>Everything you need to bill clients, get paid faster, and look completely professional doing it.</p>
+        </div>
+
+        <!-- Feature 1: Invoicing -->
+        <article class="feature-row reveal">
+          <div class="feature-text">
+            <span class="feature-tag indigo">⚡ Lightning-Fast Invoicing</span>
+            <h3>Send a beautiful, GST-ready invoice in 30 seconds.</h3>
+            <p>Generate professional PDFs in seconds. Customize with your logo, brand colors, and payment terms. Share instantly via email or WhatsApp link — your client clicks once and pays.</p>
+            <ul class="feature-bullets">
+              <li class="feature-bullet">
+                <span class="b-ico indigo" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 13h6M9 17h4"/></svg>
+                </span>
+                CGST, SGST, IGST, HSN codes — fully GST-compliant
+              </li>
+              <li class="feature-bullet">
+                <span class="b-ico indigo" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".75" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".75" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".75" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".75" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+                </span>
+                Custom logo, fonts, and brand colors
+              </li>
+              <li class="feature-bullet">
+                <span class="b-ico indigo" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                </span>
+                Save clients & line items as templates — reuse in 1 click
+              </li>
+            </ul>
+          </div>
+          <div class="feature-visual">
+            <div class="editor-mockup">
+              <div class="editor-tabs">
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                <span class="url">app.invoicy.in/new</span>
+              </div>
+              <div class="editor-body">
+                <div class="editor-row">
+                  <div class="editor-field focused">
+                    <label>Bill To</label>
+                    <div class="input">Acme Pvt. Ltd.</div>
+                  </div>
+                  <div class="editor-field">
+                    <label>Due Date</label>
+                    <div class="input">28 Apr 2026</div>
+                  </div>
+                </div>
+                <div class="editor-table">
+                  <div class="editor-table-row head">
+                    <span>Item</span><span class="right">Qty</span><span class="right">Rate</span><span class="right">Amount</span>
+                  </div>
+                  <div class="editor-table-row">
+                    <span>Brand identity design</span><span class="right">1</span><span class="right">₹60,000</span><span class="right total">₹60,000</span>
+                  </div>
+                  <div class="editor-table-row">
+                    <span>Web mockups</span><span class="right">2</span><span class="right">₹6,000</span><span class="right total">₹12,000</span>
+                  </div>
+                  <div class="editor-table-row" style="background:var(--slate-50);">
+                    <span style="color:var(--text-subtle);">CGST (9%) + SGST (9%)</span><span></span><span></span><span class="right total">₹12,960</span>
+                  </div>
+                  <div class="editor-table-row" style="background:var(--indigo-50); color:var(--indigo-700);">
+                    <span style="font-weight:700;">Total</span><span></span><span></span><span class="right" style="font-weight:800;">₹84,960</span>
+                  </div>
+                </div>
+                <div class="editor-share">
+                  <button class="share-btn email">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+                    Email
+                  </button>
+                  <button class="share-btn whatsapp">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg>
+                    WhatsApp
+                  </button>
+                  <button class="share-btn pdf">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    PDF
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Feature 2: Reminders -->
+        <article class="feature-row reverse reveal">
+          <div class="feature-text">
+            <span class="feature-tag emerald">🔔 Automated "Polite" Reminders</span>
+            <h3>Set the schedule. We do the awkward bit.</h3>
+            <p>Set your schedule and let Invoicy follow up. We send automated reminders 3 days before, on the due date, and when overdue — over email, WhatsApp, or both. Tone is professional. Always.</p>
+            <ul class="feature-bullets">
+              <li class="feature-bullet">
+                <span class="b-ico emerald" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </span>
+                Pre-due, on-due, and overdue reminders — fully customizable
+              </li>
+              <li class="feature-bullet">
+                <span class="b-ico emerald" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                </span>
+                Email + WhatsApp share links · 1-click for your client
+              </li>
+              <li class="feature-bullet">
+                <span class="b-ico emerald" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="10" y1="15" x2="10" y2="9"/><line x1="14" y1="15" x2="14" y2="9"/></svg>
+                </span>
+                Auto-pause when paid · never embarrass yourself
+              </li>
+            </ul>
+          </div>
+          <div class="feature-visual">
+            <div class="reminder-mockup">
+              <div class="reminder-mock-head">
+                <div class="reminder-mock-title">Reminder schedule</div>
+                <div class="reminder-mock-toggle"><span class="toggle-pill"></span> Active</div>
+              </div>
+              <div class="timeline">
+                <div class="timeline-item">
+                  <span class="timeline-dot green"></span>
+                  <div class="timeline-head">
+                    <span class="timeline-title">Friendly heads-up</span>
+                    <span class="timeline-when">3 days before due</span>
+                  </div>
+                  <p class="timeline-msg">"Hi Priya, just a heads-up — invoice #INV-2026-0142 is due on Friday."</p>
+                  <div class="timeline-channels">
+                    <span class="channel-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg> Email</span>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <span class="timeline-dot amber"></span>
+                  <div class="timeline-head">
+                    <span class="timeline-title">Due-date nudge</span>
+                    <span class="timeline-when">on due date</span>
+                  </div>
+                  <p class="timeline-msg">"Quick reminder — invoice #INV-2026-0142 (₹84,500) is due today. Pay in 1 click →"</p>
+                  <div class="timeline-channels">
+                    <span class="channel-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg> Email</span>
+                    <span class="channel-chip"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2z"/></svg> WhatsApp</span>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <span class="timeline-dot rose"></span>
+                  <div class="timeline-head">
+                    <span class="timeline-title">Firm but polite</span>
+                    <span class="timeline-when">3, 7, 14 days overdue</span>
+                  </div>
+                  <p class="timeline-msg">"Following up on invoice #INV-2026-0142, now overdue. Could you let us know about the timeline?"</p>
+                  <div class="timeline-channels">
+                    <span class="channel-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg> Email</span>
+                    <span class="channel-chip"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2z"/></svg> WhatsApp</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Feature 3: Tracking -->
+        <article class="feature-row reveal">
+          <div class="feature-text">
+            <span class="feature-tag rose">📊 Complete Payment Tracking</span>
+            <h3>Always know exactly who owes you what.</h3>
+            <p>A clean dashboard shows you total outstanding, overdue invoices, and your average payment time — so you can finally answer "how's cash flow this month?" in two seconds.</p>
+            <ul class="feature-bullets">
+              <li class="feature-bullet">
+                <span class="b-ico rose" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="6" y2="14"/><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/></svg>
+                </span>
+                Total outstanding · overdue · paid · drafts — at a glance
+              </li>
+              <li class="feature-bullet">
+                <span class="b-ico rose" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="8"/><path d="M12 10v4l3 1.5"/><path d="M9 2h6"/><path d="M12 4v2"/></svg>
+                </span>
+                Average days-to-payment per client (spot the slow payers)
+              </li>
+              <li class="feature-bullet">
+                <span class="b-ico rose" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </span>
+                Export to CSV or your accountant — anytime
+              </li>
+            </ul>
+          </div>
+          <div class="feature-visual">
+            <div class="dashboard-mockup">
+              <div class="dash-head">
+                <div class="dash-title">Cash flow overview</div>
+                <div class="dash-period">Last 30 days</div>
+              </div>
+              <div class="dash-stats">
+                <div class="dash-stat">
+                  <div class="lbl">Outstanding</div>
+                  <div class="val">₹3,24,500</div>
+                  <div class="delta down">▼ 18% vs prev</div>
+                </div>
+                <div class="dash-stat">
+                  <div class="lbl">Collected</div>
+                  <div class="val">₹6,12,800</div>
+                  <div class="delta up">▲ 42% vs prev</div>
+                </div>
+                <div class="dash-stat">
+                  <div class="lbl">Avg. days</div>
+                  <div class="val">6.2</div>
+                  <div class="delta up">▲ Faster</div>
+                </div>
+              </div>
+              <!-- Inline area chart -->
+              <svg class="dash-chart" viewBox="0 0 400 130" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="dashGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#10B981" stop-opacity="0.35"/>
+                    <stop offset="100%" stop-color="#10B981" stop-opacity="0"/>
+                  </linearGradient>
+                  <linearGradient id="dashLine" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#4F46E5"/>
+                    <stop offset="100%" stop-color="#10B981"/>
+                  </linearGradient>
+                </defs>
+                <!-- Grid -->
+                <line x1="0" y1="32" x2="400" y2="32" stroke="#F1F5F9" stroke-width="1"/>
+                <line x1="0" y1="64" x2="400" y2="64" stroke="#F1F5F9" stroke-width="1"/>
+                <line x1="0" y1="96" x2="400" y2="96" stroke="#F1F5F9" stroke-width="1"/>
+                <!-- Area -->
+                <path d="M0,98 L40,84 L80,90 L120,72 L160,76 L200,58 L240,48 L280,52 L320,32 L360,24 L400,18 L400,130 L0,130 Z" fill="url(#dashGrad)"/>
+                <!-- Line -->
+                <path d="M0,98 L40,84 L80,90 L120,72 L160,76 L200,58 L240,48 L280,52 L320,32 L360,24 L400,18" fill="none" stroke="url(#dashLine)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <!-- End dot -->
+                <circle cx="400" cy="18" r="4" fill="#10B981"/>
+                <circle cx="400" cy="18" r="8" fill="#10B981" opacity="0.2"/>
+              </svg>
+              <div class="dash-list">
+                <div class="dash-item">
+                  <span class="who">Acme Pvt. Ltd. <span style="color:var(--text-subtle); font-weight:400;">· #INV-0142</span></span>
+                  <span class="amt">₹84,500</span>
+                  <span class="dash-badge paid">Paid</span>
+                </div>
+                <div class="dash-item">
+                  <span class="who">Bluesky Media <span style="color:var(--text-subtle); font-weight:400;">· #INV-0141</span></span>
+                  <span class="amt">₹1,24,000</span>
+                  <span class="dash-badge due">Due 3d</span>
+                </div>
+                <div class="dash-item">
+                  <span class="who">Phoenix Labs <span style="color:var(--text-subtle); font-weight:400;">· #INV-0138</span></span>
+                  <span class="amt">₹62,300</span>
+                  <span class="dash-badge overdue">7d overdue</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ HOW IT WORKS ============ -->
+    <section class="how" id="how" aria-labelledby="how-h">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow"><span class="dot"></span> How It Works</span>
+          <h2 id="how-h">From creating an invoice to getting paid<br/>in 3 steps.</h2>
+          <p>No accountancy degree required. If you can send an email, you can run Invoicy.</p>
+        </div>
+
+        <div class="how-grid reveal-stagger">
+          <article class="how-card">
+            <span class="how-step-num">01</span>
+            <h3>Create your invoice</h3>
+            <p>Add a client, line items, and tax — or pick a saved template and tweak.</p>
+            <div class="how-mini">
+              <div class="how-input-row"><span class="l">Client</span><span class="v">Acme Pvt. Ltd.</span></div>
+              <div class="how-input-row"><span class="l">Amount</span><span class="v">₹84,500</span></div>
+              <div class="how-input-row"><span class="l">Due</span><span class="v">28 Apr 2026</span></div>
+            </div>
+          </article>
+
+          <article class="how-card">
+            <span class="how-step-num">02</span>
+            <h3>Auto-send & remind</h3>
+            <p>Invoicy fires reminders 3 days before, on the due date, and when overdue.</p>
+            <div class="how-mini">
+              <div class="how-calendar">
+                <div class="cal-cell muted">21</div><div class="cal-cell muted">22</div>
+                <div class="cal-cell muted">23</div><div class="cal-cell muted">24</div>
+                <div class="cal-cell green">25</div><div class="cal-cell">26</div>
+                <div class="cal-cell">27</div><div class="cal-cell amber">28</div>
+                <div class="cal-cell">29</div><div class="cal-cell">30</div>
+                <div class="cal-cell">1</div><div class="cal-cell rose">2</div>
+                <div class="cal-cell">3</div><div class="cal-cell">4</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="how-card">
+            <span class="how-step-num">03</span>
+            <h3>Get paid</h3>
+            <p>Watch your dashboard turn green. Reconcile in seconds, not hours.</p>
+            <div class="how-mini">
+              <svg class="how-graph" viewBox="0 0 240 100" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="howGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#10B981" stop-opacity="0.4"/>
+                    <stop offset="100%" stop-color="#10B981" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M0,80 L40,72 L80,76 L120,52 L160,40 L200,18 L240,10 L240,100 L0,100 Z" fill="url(#howGrad)"/>
+                <path d="M0,80 L40,72 L80,76 L120,52 L160,40 L200,18 L240,10" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="240" cy="10" r="4" fill="#10B981"/>
+              </svg>
+              <div class="how-graph-foot"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PRICING ============ -->
+    <section class="pricing" id="pricing" aria-labelledby="pricing-h">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow"><span class="dot"></span> Pricing</span>
+          <h2 id="pricing-h">Simple pricing that pays for itself.</h2>
+          <p>Start free, upgrade when you grow. No hidden fees. Cancel anytime.</p>
+        </div>
+
+        <div class="pricing-grid">
+          <article class="price-card reveal">
+            <div class="price-name">Free</div>
+            <div class="price-tag-line">For solo freelancers getting started.</div>
+            <div class="price-amount"><span class="currency">₹</span><span class="v">0</span><span class="u">/forever</span></div>
+            <ul class="price-list">
+              <li><span class="p-dot" aria-hidden="true"></span> Up to 5 invoices per month</li>
+              <li><span class="p-dot" aria-hidden="true"></span> Standard PDF generation (Invoicy watermark)</li>
+              <li><span class="p-dot" aria-hidden="true"></span> Basic email reminders</li>
+              <li><span class="p-dot" aria-hidden="true"></span> GST-compliant tax fields</li>
+              <li class="muted"><span class="p-dash" aria-hidden="true"></span> WhatsApp reminders</li>
+              <li class="muted"><span class="p-dash" aria-hidden="true"></span> Recurring billing</li>
+            </ul>
+            <a href="tOpF4wBtvQOyYwaxwJxgiQ.html#" class="btn btn-secondary btn-lg price-cta" data-cta="pricing-free">Get Started Free</a>
+          </article>
+
+          <article class="price-card featured reveal">
+            <span class="price-ribbon">Most Popular</span>
+            <div class="price-name">Pro</div>
+            <div class="price-tag-line">For agencies and growing teams.</div>
+            <div class="price-amount"><span class="currency">₹</span><span class="v">499</span><span class="u">/month</span></div>
+            <ul class="price-list">
+              <li><span class="p-dot" aria-hidden="true"></span> <b>Unlimited</b> invoices</li>
+              <li><span class="p-dot" aria-hidden="true"></span> <b>No</b> Invoicy watermark · fully white-labeled</li>
+              <li><span class="p-dot" aria-hidden="true"></span> Smart reminder schedules (email + WhatsApp)</li>
+              <li><span class="p-dot" aria-hidden="true"></span> Recurring billing setup</li>
+              <li><span class="p-dot" aria-hidden="true"></span> Multi-user team access</li>
+              <li><span class="p-dot" aria-hidden="true"></span> Priority email support</li>
+            </ul>
+            <a href="tOpF4wBtvQOyYwaxwJxgiQ.html#" class="btn btn-primary btn-lg price-cta" data-cta="pricing-pro">Upgrade to Pro
+              <svg class="btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FAQ ============ -->
+    <section class="faq" id="faq" aria-labelledby="faq-h">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow"><span class="dot"></span> FAQ</span>
+          <h2 id="faq-h">Questions, answered.</h2>
+          <p>Still have something on your mind? <a href="tOpF4wBtvQOyYwaxwJxgiQ.html#" style="color:var(--indigo-600); font-weight:600;">Drop us a line</a>.</p>
+        </div>
+
+        <div class="faq-list">
+          <details class="faq-item reveal">
+            <summary class="faq-q">
+              Can I send WhatsApp reminders?
+              <span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            </summary>
+            <div class="faq-a">Yes. Invoicy generates 1-click WhatsApp share links with a pre-filled, polite reminder message and the invoice attached as a secure PDF link. Your client taps once and sees everything they need.</div>
+          </details>
+
+          <details class="faq-item reveal">
+            <summary class="faq-q">
+              Is it safe for my client data?
+              <span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            </summary>
+            <div class="faq-a">We use bank-level AES-256 encryption at rest, TLS 1.3 in transit, and audited access controls. Your data is never sold, never shared, and you can export everything at any time. We're built on India-region infrastructure for low latency and data residency.</div>
+          </details>
+
+          <details class="faq-item reveal">
+            <summary class="faq-q">
+              Can I add GST details?
+              <span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            </summary>
+            <div class="faq-a">Yes — Invoicy fully supports Indian tax formats including CGST, SGST, IGST, HSN/SAC codes, place of supply, and reverse charge invoices. We handle interstate vs intrastate logic automatically based on the GSTIN you enter.</div>
+          </details>
+
+          <details class="faq-item reveal">
+            <summary class="faq-q">
+              Do reminders feel automated and pushy?
+              <span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            </summary>
+            <div class="faq-a">No — that was the whole point. Our default templates are written like a human would write them: polite, professional, and appropriately firm only when an invoice is significantly overdue. You can fully customize the wording, or write your own.</div>
+          </details>
+
+          <details class="faq-item reveal">
+            <summary class="faq-q">
+              Can I set up recurring invoices?
+              <span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            </summary>
+            <div class="faq-a">Recurring billing is available on the Pro plan. Set the cadence (weekly, monthly, quarterly), add an optional end date, and Invoicy generates and sends each invoice on schedule. Perfect for retainer clients.</div>
+          </details>
+
+          <details class="faq-item reveal">
+            <summary class="faq-q">
+              What happens to my invoices if I cancel?
+              <span class="faq-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            </summary>
+            <div class="faq-a">You can export every invoice as PDF or CSV at any time, even after canceling — including a full audit trail. Your data is yours. We hold onto your account for 90 days after cancellation in case you change your mind.</div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FINAL CTA ============ -->
+    <section class="final-cta" id="cta">
+      <div class="container">
+        <div class="final-card reveal">
+          <h2>Ready to make late payments<br/>a thing of the past?</h2>
+          <p>Join 7,500+ Indian freelancers and agencies who've already stopped chasing.</p>
+          <a href="tOpF4wBtvQOyYwaxwJxgiQ.html#" class="btn btn-lg" data-cta="final">Create Your First Invoice Free
+            <svg class="btn-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+          <div class="meta-row">No credit card required · Setup in 2 minutes · Free forever plan</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">
+            <span class="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a2 2 0 0 0 2 2h4"/><path d="M5 8V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-3"/><path d="M2 13h10"/><path d="m9 16 3-3-3-3"/></svg>
+            </span>
+            Invoicy
+          </div>
+          <p class="footer-tag">Automated invoicing & smart payment reminders for Indian freelancers, agencies, and SMEs. Get paid on time, every time.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="tOpF4wBtvQOyYwaxwJxgiQ.html#features">Features</a></li>
+            <li><a href="tOpF4wBtvQOyYwaxwJxgiQ.html#pricing">Pricing</a></li>
+            <li><a href="tOpF4wBtvQOyYwaxwJxgiQ.html#how">How it works</a></li>
+            <li><a href="tOpF4wBtvQOyYwaxwJxgiQ.html#faq">FAQ</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="tOpF4wBtvQOyYwaxwJxgiQ.html#">About</a></li>
+            <li><a href="tOpF4wBtvQOyYwaxwJxgiQ.html#">Blog</a></li>
+            <li><a href="tOpF4wBtvQOyYwaxwJxgiQ.html#">Careers</a></li>
+            <li><a href="tOpF4wBtvQOyYwaxwJxgiQ.html#">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="tOpF4wBtvQOyYwaxwJxgiQ.html#">Privacy</a></li>
+            <li><a href="tOpF4wBtvQOyYwaxwJxgiQ.html#">Terms</a></li>
+            <li><a href="tOpF4wBtvQOyYwaxwJxgiQ.html#">Security</a></li>
+            <li><a href="tOpF4wBtvQOyYwaxwJxgiQ.html#">GST policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Invoicy Technologies Pvt. Ltd. · Made in India 🇮🇳</span>
+        <div class="footer-socials" aria-label="Social links">
+          <a href="tOpF4wBtvQOyYwaxwJxgiQ.html#" aria-label="Twitter"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+          <a href="tOpF4wBtvQOyYwaxwJxgiQ.html#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></a>
+          <a href="tOpF4wBtvQOyYwaxwJxgiQ.html#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============ ANALYTICS ============ -->
+  <!-- Google Analytics 4 (replace G-XXXXXXXXXX with real ID) -->
+  <script data-cfasync="false" src="https://pub.hyperagent.com/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX', { send_page_view: true });
+  </script>
+
+  <!-- ============ ENHANCEMENT JS ============ -->
+  <script>
+    (function () {
+      'use strict';
+
+      // Sticky nav scroll state
+      const nav = document.getElementById('nav');
+      let lastY = 0;
+      const onScroll = () => {
+        const y = window.scrollY;
+        if (y > 8) nav.classList.add('scrolled'); else nav.classList.remove('scrolled');
+        lastY = y;
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      // Reveal-on-scroll
+      const supportsIO = 'IntersectionObserver' in window;
+      const reveals = document.querySelectorAll('.reveal, .reveal-stagger');
+      if (supportsIO) {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add('in');
+              io.unobserve(e.target);
+            }
+          });
+        }, { threshold: 0.2, rootMargin: '0px 0px -40px 0px' });
+        reveals.forEach((el) => io.observe(el));
+      } else {
+        reveals.forEach((el) => el.classList.add('in'));
+      }
+
+      // CTA event tracking
+      document.querySelectorAll('[data-cta]').forEach((btn) => {
+        btn.addEventListener('click', (ev) => {
+          const location = btn.getAttribute('data-cta');
+          try {
+            if (typeof gtag === 'function') {
+              gtag('event', 'cta_click', {
+                cta_location: location,
+                cta_text: btn.textContent.trim().slice(0, 60)
+              });
+            }
+            // Optional: support Plausible if loaded
+            if (window.plausible) {
+              window.plausible('CTA Click', { props: { location: location } });
+            }
+          } catch (e) { /* analytics best-effort */ }
+        });
+      });
+
+      // Smooth-scroll handling already via CSS scroll-behavior: smooth
+      // Close other FAQs when one opens (single-open accordion)
+      document.querySelectorAll('.faq-item').forEach((item) => {
+        item.addEventListener('toggle', () => {
+          if (item.open) {
+            document.querySelectorAll('.faq-item[open]').forEach((other) => {
+              if (other !== item) other.removeAttribute('open');
+            });
+          }
+        });
+      });
+    })();
+  </script>
+<script>
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && window.parent !== window) {
+    window.parent.postMessage({ type: 'close-fullscreen' }, '*');
+  }
+});
+</script>
+<!-- broken-img-handler -->
+<script>
+(function(){
+  if(window.__brokenImgHandler)return;
+  window.__brokenImgHandler=true;
+  var MAX=5,DELAYS=[2000,4000,8000,16000,32000];
+  document.addEventListener('error',function(e){
+    var img=e.target;
+    if(!img||img.tagName!=='IMG')return;
+    var liveSrc=img.getAttribute('src');
+    var src=img.dataset.haOriginalSrc||liveSrc;
+    if(!src)return;
+    if(img.dataset.haOriginalSrc&&liveSrc&&liveSrc!==img.dataset.haOriginalSrc&&liveSrc.indexOf('_r=')<0){src=liveSrc;img.dataset.haOriginalSrc=src;img.dataset.haRetryCount='0'}
+    else if(!img.dataset.haOriginalSrc){img.dataset.haOriginalSrc=src}
+    var attempt=parseInt(img.dataset.haRetryCount||'0',10);
+    if(img.dataset.haPhId){var old=document.getElementById(img.dataset.haPhId);if(old)old.remove()}
+    var ph=document.createElement('div');
+    ph.className='ha-img-placeholder'+(attempt>=MAX?' ha-failed':'');
+    ph.id='ha-ph-'+Math.random().toString(36).slice(2,9);
+    var w=img.getAttribute('width');var h=img.getAttribute('height');
+    if(w)ph.style.width=w+(isNaN(Number(w))?'':'px');
+    else if(img.style.width)ph.style.width=img.style.width;
+    else if(img.width>1)ph.style.width=img.width+'px';
+    if(h)ph.style.height=h+(isNaN(Number(h))?'':'px');
+    else if(img.style.height)ph.style.height=img.style.height;
+    else if(img.height>1)ph.style.height=img.height+'px';
+    ph.textContent=attempt>=MAX?'Image unavailable':'Loading image\u2026';
+    img.dataset.haPhId=ph.id;
+    if(img.dataset.haOrigDisplay==null)img.dataset.haOrigDisplay=img.style.display||'';
+    img.style.display='none';
+    img.insertAdjacentElement('afterend',ph);
+    if(attempt<MAX){
+      img.dataset.haRetryCount=String(attempt+1);
+      setTimeout(function(){
+        if(!img.isConnected)return;
+        if(img.dataset.haOriginalSrc!==src)return;
+        if(img.complete&&img.naturalWidth>0)return;
+        var curSrc=img.getAttribute('src');
+        if(curSrc&&curSrc.indexOf(src)!==0)return;
+        var fresh=src+(src.indexOf('?')>=0?'&':'?')+'_r='+(attempt+1)+'_'+Date.now();
+        img.src=fresh;
+      },DELAYS[attempt]);
+    }
+  },true);
+  document.addEventListener('load',function(e){
+    var img=e.target;
+    if(!img||img.tagName!=='IMG')return;
+    if(img.dataset.haPhId){
+      var ph=document.getElementById(img.dataset.haPhId);
+      if(ph)ph.remove();
+      delete img.dataset.haPhId;
+      img.style.display=img.dataset.haOrigDisplay||'';
+      delete img.dataset.haOrigDisplay;
+      delete img.dataset.haOriginalSrc;
+      delete img.dataset.haRetryCount;
+    }
+  },true);
+})();
+</script>
+</body>
+</html>

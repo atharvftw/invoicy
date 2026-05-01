@@ -187,7 +187,12 @@ export default function Sidebar() {
               </div>
             </Show>
             <Show when="signed-out">
-              <SignInButton mode="modal">
+              <SignInButton
+                mode="modal"
+                forceRedirectUrl="/invoice/new"
+                fallbackRedirectUrl="/invoice/new"
+                signUpForceRedirectUrl="/invoice/new"
+              >
                 <button className="text-[10px] text-indigo-600 font-medium hover:underline">
                   Sign in
                 </button>
