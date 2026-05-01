@@ -7,7 +7,7 @@ import Script from "next/script";
 const LANDING_PAGE_PATH = path.join(
   process.cwd(),
   "landing",
-  "tOpF4wBtvQOyYwaxwJxgiQ.html"
+  "invoicy-automate-invoices-get-paid-faster.html"
 );
 const LANDING_FONT_IMPORT =
   "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');";
