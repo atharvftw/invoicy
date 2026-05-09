@@ -25,7 +25,7 @@ import {
 } from "@/types/invoice";
 import { formatDate, formatCurrency } from "@/lib/utils";
 
-const ALL_STATUSES: InvoiceStatus[] = ["draft", "sent", "partially_paid", "paid"];
+const ALL_STATUSES: InvoiceStatus[] = ["draft", "sent", "partially_paid", "paid", "overdue"];
 
 export default function HistoryPage() {
   const router = useRouter();

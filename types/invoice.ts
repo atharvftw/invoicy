@@ -1,5 +1,5 @@
 export type Currency = "INR" | "USD" | "EUR" | "GBP";
-export type InvoiceStatus = "draft" | "sent" | "paid" | "partially_paid";
+export type InvoiceStatus = "draft" | "sent" | "paid" | "partially_paid" | "overdue";
 export type InvoiceTheme = "classic" | "minimal" | "modern" | "corporate" | "retro";
 
 export interface Party {
@@ -97,6 +97,7 @@ export const STATUS_LABELS: Record<InvoiceStatus, string> = {
   sent: "Sent",
   paid: "Paid",
   partially_paid: "Partially Paid",
+  overdue: "Overdue",
 };
 
 export const STATUS_COLORS: Record<InvoiceStatus, string> = {
@@ -104,6 +105,7 @@ export const STATUS_COLORS: Record<InvoiceStatus, string> = {
   sent: "bg-blue-100 text-blue-700",
   paid: "bg-green-100 text-green-700",
   partially_paid: "bg-amber-100 text-amber-700",
+  overdue: "bg-rose-100 text-rose-700",
 };
 
 export function createEmptyInvoice(): Invoice {
