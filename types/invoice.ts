@@ -46,6 +46,23 @@ export interface Recurrence {
   active: boolean;
 }
 
+export interface RecurringSchedule {
+  id: string;
+  name: string;
+  clientName: string;
+  clientEmail: string;
+  amount: number;
+  currency: Currency;
+  frequency: "weekly" | "monthly" | "quarterly";
+  startDate: string;
+  endDate?: string;
+  active: boolean;
+  autoGenerate: boolean;
+  lastGenerated?: string;
+  nextDate: string;
+  created_at: string;
+}
+
 export interface Invoice {
   id: string;
   invoice_number: string;
