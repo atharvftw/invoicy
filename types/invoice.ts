@@ -38,6 +38,17 @@ export interface Client {
   notes?: string;
   created_at: string;
   updated_at?: string;
+  // AI Intelligence
+  riskScore?: number; // 0-100, higher = riskier
+  avgDaysLate?: number; // computed from invoice history
+  totalInvoices?: number;
+  paidOnTime?: number;
+  paidLate?: number;
+  unpaidCount?: number;
+  preferredChannel?: ReminderChannel; // AI learns this
+  preferredTone?: ReminderTone;       // AI adapts this
+  tags?: string[];
+  isVIP?: boolean;
 }
 
 export interface Recurrence {

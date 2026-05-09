@@ -17,6 +17,8 @@ import {
 import { useClientStore } from "@/store/clientStore";
 import { useInvoiceStore } from "@/store/invoiceStore";
 import { STATUS_LABELS, STATUS_COLORS, CURRENCY_SYMBOLS } from "@/types/invoice";
+import { useClientIntelligence } from "@/hooks/useClientIntelligence";
+import { getRiskLabelText, getRiskBadgeColor } from "@/lib/clientIntelligence";
 import { formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
@@ -34,6 +36,8 @@ export default function ClientDetailPage({ params }: { params: { id: string } })
       ),
     [invoices, client]
   );
+
+  const { intelligence } = useClientIntelligence(params.id);
 
   const stats = useMemo(() => {
     const total = clientInvoices.reduce((sum, i) => sum + i.total, 0);
@@ -100,8 +104,65 @@ export default function ClientDetailPage({ params }: { params: { id: string } })
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: Details */}
+        {/* Left: Intelligence + Details */}
         <div className="lg:col-span-1 space-y-4">
+          {/* AI Intelligence */}
+          {intelligence && (
+            <div className="section-card space-y-4">
+              <h3 className="text-sm font-semibold text-gray-900">AI Payment Profile</h3>
+              <div className="flex items-center gap-3">
+                <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center shrink-0", getRiskBadgeColor(intelligence.riskLabel).split(" ")[0])}>
+                  <span className="text-lg font-bold">{intelligence.riskScore}</span>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-800">{getRiskLabelText(intelligence.riskLabel)}</p>
+                  <p className="text-xs text-gray-400">Risk Score · {intelligence.collectionRate}% collected</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="p-2.5 rounded-lg bg-gray-50">
+                  <p className="text-[10px] text-gray-400 uppercase">Avg Days Late</p>
+                  <p className="font-semibold text-gray-900">{intelligence.avgDaysLate}</p>
+                </div>
+                <div className="p-2.5 rounded-lg bg-gray-50">
+                  <p className="text-[10px] text-gray-400 uppercase">Invoices</p>
+                  <p className="font-semibold text-gray-900">{intelligence.totalInvoices}</p>
+                </div>
+                <div className="p-2.5 rounded-lg bg-gray-50">
+                  <p className="text-[10px] text-gray-400 uppercase">Paid Late</p>
+                  <p className="font-semibold text-gray-900">{intelligence.paidLate}</p>
+                </div>
+                <div className="p-2.5 rounded-lg bg-gray-50">
+                  <p className="text-[10px] text-gray-400 uppercase">Unpaid</p>
+                  <p className="font-semibold text-gray-900">{intelligence.unpaidCount}</p>
+                </div>
+              </div>
+              {intelligence.suggestedActions.length > 0 && (
+                <div>
+                  <p className="text-[10px] text-gray-400 uppercase mb-1.5">AI Suggestions</p>
+                  <div className="space-y-1.5">
+                    {intelligence.suggestedActions.map((action, idx) => (
+                      <div key={idx} className="flex items-start gap-2 text-sm">
+                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5 shrink-0" />
+                        <span className="text-gray-600">{action}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
+                <div className="flex-1">
+                  <p className="text-[10px] text-gray-400 uppercase">Channel</p>
+                  <p className="text-xs font-medium text-gray-700 capitalize">{intelligence.preferredChannel}</p>
+                </div>
+                <div className="flex-1">
+                  <p className="text-[10px] text-gray-400 uppercase">Tone</p>
+                  <p className="text-xs font-medium text-gray-700 capitalize">{intelligence.preferredTone}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="section-card space-y-4">
             <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
               <Building2 size={15} className="text-gray-400" /> Details

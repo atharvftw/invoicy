@@ -17,6 +17,8 @@ import {
 import { useClientStore } from "@/store/clientStore";
 import { useInvoiceStore } from "@/store/invoiceStore";
 import { Client } from "@/types/invoice";
+import { useClientIntelligence } from "@/hooks/useClientIntelligence";
+import { getRiskBadgeColor, getRiskLabelText } from "@/lib/clientIntelligence";
 import { cn } from "@/lib/utils";
 
 export default function ClientsPage() {
@@ -34,6 +36,8 @@ export default function ClientsPage() {
     gstin: "",
     notes: "",
   });
+
+  const { allIntelligence } = useClientIntelligence();
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
@@ -140,6 +144,9 @@ export default function ClientsPage() {
                 <th className="text-left text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">
                   GSTIN
                 </th>
+                <th className="text-center text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">
+                  Risk
+                </th>
                 <th className="text-right text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">
                   Invoices
                 </th>
@@ -157,6 +164,7 @@ export default function ClientsPage() {
                   outstanding: 0,
                   invoiceCount: 0,
                 };
+                const intel = allIntelligence.find((i) => i.client.id === client.id)?.intelligence;
                 return (
                   <tr
                     key={client.id}
@@ -176,6 +184,15 @@ export default function ClientsPage() {
                     </td>
                     <td className="px-4 py-3.5">
                       <p className="text-sm text-gray-600 font-mono">{client.gstin || "—"}</p>
+                    </td>
+                    <td className="px-4 py-3.5 text-center">
+                      {intel ? (
+                        <span className={cn("badge text-[10px] border", getRiskBadgeColor(intel.riskLabel))}>
+                          {getRiskLabelText(intel.riskLabel)} · {intel.riskScore}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-gray-400">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-3.5 text-right">
                       <p className="text-sm font-medium text-gray-800">{stats.invoiceCount}</p>
