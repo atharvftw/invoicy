@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Bell, Mail, MessageCircle, Plus, Trash2, ToggleLeft, ToggleRight, AlertTriangle, Percent, IndianRupee, Clock, X, Bot, ChevronRight, ShieldAlert, Sparkles } from "lucide-react";
+import { Bell, Mail, MessageCircle, Plus, Trash2, ToggleLeft, ToggleRight, AlertTriangle, Percent, IndianRupee, Clock, X, Bot, ChevronRight, ShieldAlert, Sparkles, Workflow, ArrowRight } from "lucide-react";
 import { useReminderStore } from "@/store/reminderStore";
 import { useInvoiceStore } from "@/store/invoiceStore";
 import { useClientIntelligence } from "@/hooks/useClientIntelligence";
@@ -37,6 +37,12 @@ export default function RemindersPage() {
     daysOffset: 3,
     channel: "email" as ReminderChannel,
   });
+
+  const [rules, setRules] = useState<{ id: string; condition: string; action: string; active: boolean }[]>([
+    { id: "1", condition: "Invoice overdue > 14 days", action: "Add late fee + send firm reminder", active: true },
+    { id: "2", condition: "Client risk score > 60", action: "Escalate to collections workflow", active: true },
+    { id: "3", condition: "Invoice overdue > 30 days", action: "Notify founder + generate statement", active: false },
+  ]);
 
   const overdueInvoices = useMemo(() =>
     invoices.filter((inv) => inv.status === "overdue").sort((a, b) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime()),
@@ -221,6 +227,41 @@ export default function RemindersPage() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Automation Rules */}
+      <div className="section-card mt-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Workflow size={16} className="text-indigo-500" />
+          <h3 className="text-sm font-semibold text-gray-900">Automation Rules</h3>
+          <span className="badge bg-indigo-50 text-indigo-700 text-[10px] ml-2">Beta</span>
+        </div>
+        <p className="text-sm text-gray-500 mb-4">IF-THEN rules that trigger automatically based on invoice and client behavior.</p>
+        <div className="space-y-2">
+          {rules.map((rule) => (
+            <div key={rule.id} className={cn("flex items-center gap-3 px-4 py-3 rounded-xl border transition-all", rule.active ? "border-gray-100 bg-gray-50/50" : "border-gray-100 bg-gray-50/30 opacity-60")}>
+              <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center shrink-0", rule.active ? "bg-indigo-50 text-indigo-600" : "bg-gray-100 text-gray-400")}>
+                <Sparkles size={14} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs font-medium text-gray-500 uppercase">IF</span>
+                  <span className="text-sm font-medium text-gray-800">{rule.condition}</span>
+                  <ArrowRight size={12} className="text-gray-400" />
+                  <span className="text-xs font-medium text-gray-500 uppercase">THEN</span>
+                  <span className="text-sm font-medium text-indigo-700">{rule.action}</span>
+                </div>
+              </div>
+              <button
+                onClick={() => setRules(rules.map((r) => r.id === rule.id ? { ...r, active: !r.active } : r))}
+                className="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+                title={rule.active ? "Disable" : "Enable"}
+              >
+                {rule.active ? <ToggleRight size={20} className="text-indigo-600" /> : <ToggleLeft size={20} />}
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Schedule Modal */}
