@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { Bell, Mail, MessageCircle, Plus, Trash2, ToggleLeft, ToggleRight, AlertTriangle, Percent, IndianRupee, Clock, X } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Bell, Mail, MessageCircle, Plus, Trash2, ToggleLeft, ToggleRight, AlertTriangle, Percent, IndianRupee, Clock, X, Bot, ChevronRight, ShieldAlert, Sparkles } from "lucide-react";
 import { useReminderStore } from "@/store/reminderStore";
-import { ReminderTrigger, ReminderChannel, ReminderTone } from "@/types/invoice";
+import { useInvoiceStore } from "@/store/invoiceStore";
+import { useClientIntelligence } from "@/hooks/useClientIntelligence";
+import { ReminderTrigger, ReminderChannel, ReminderTone, CURRENCY_SYMBOLS } from "@/types/invoice";
 import { cn } from "@/lib/utils";
 
 const TRIGGER_LABELS: Record<ReminderTrigger, string> = {
@@ -26,6 +28,8 @@ const CHANNEL_ICONS: Record<ReminderChannel, React.ReactNode> = {
 
 export default function RemindersPage() {
   const { schedules, templates, lateFee, addSchedule, deleteSchedule, toggleSchedule, updateTemplate, setLateFee } = useReminderStore();
+  const { invoices } = useInvoiceStore();
+  const { allIntelligence } = useClientIntelligence();
   const [scheduleModal, setScheduleModal] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -33,6 +37,13 @@ export default function RemindersPage() {
     daysOffset: 3,
     channel: "email" as ReminderChannel,
   });
+
+  const overdueInvoices = useMemo(() =>
+    invoices.filter((inv) => inv.status === "overdue").sort((a, b) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime()),
+  [invoices]);
+
+  const agentActive = schedules.some((s) => s.active);
+  const now = new Date();
 
   function handleAddSchedule(e: React.FormEvent) {
     e.preventDefault();
@@ -45,8 +56,56 @@ export default function RemindersPage() {
     <div className="max-w-5xl mx-auto px-3 sm:px-6 py-6">
       <div className="mb-6">
         <h1 className="text-xl font-bold text-gray-900">Reminder Automation</h1>
-        <p className="text-sm text-gray-500 mt-1">Configure when and how clients receive payment reminders.</p>
+        <p className="text-sm text-gray-500 mt-1">
+          {agentActive
+            ? "Your AI payment assistant is active and monitoring invoices."
+            : "Your payment assistant is paused. Enable schedules to activate."}
+        </p>
       </div>
+
+      {/* Smart Collections Agent — Overdue Monitor */}
+      {overdueInvoices.length > 0 && (
+        <div className="section-card mb-6 border-l-4 border-l-rose-400">
+          <div className="flex items-center gap-2 mb-3">
+            <Bot size={16} className="text-indigo-500" />
+            <h3 className="text-sm font-semibold text-gray-900">Smart Collections Agent</h3>
+            <span className={cn("badge text-[10px] ml-auto", agentActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500")}>
+              {agentActive ? "Active" : "Paused"}
+            </span>
+          </div>
+          <div className="space-y-2">
+            {overdueInvoices.slice(0, 5).map((inv) => {
+              const daysOverdue = Math.max(0, Math.floor((now.getTime() - new Date(inv.due_date).getTime()) / (1000 * 60 * 60 * 24)));
+              const intel = allIntelligence.find((i) =>
+                i.client.name.toLowerCase() === inv.bill_to.name.toLowerCase() ||
+                i.client.email.toLowerCase() === inv.bill_to.email.toLowerCase()
+              )?.intelligence;
+              const tone = intel?.preferredTone ?? "friendly";
+              const channel = intel?.preferredChannel ?? "email";
+              const escalation = daysOverdue > 14 ? "Late fee warning + escalation" : daysOverdue > 7 ? "Firm reminder" : "Friendly follow-up";
+              return (
+                <div key={inv.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-50">
+                  <div className="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center shrink-0">
+                    <ShieldAlert size={14} className="text-rose-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-800 truncate">{inv.invoice_number || "Draft"} · {inv.bill_to.name || "—"}</p>
+                    <p className="text-xs text-gray-400">{daysOverdue} days overdue · {CURRENCY_SYMBOLS[inv.currency]}{inv.balance_due.toLocaleString("en-IN", { minimumFractionDigits: 0 })}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-[10px] text-gray-400 uppercase">AI Action</p>
+                    <p className="text-xs font-medium text-indigo-700">{escalation}</p>
+                    <p className="text-[10px] text-gray-400">{tone} tone · {channel}</p>
+                  </div>
+                </div>
+              );
+            })}
+            {overdueInvoices.length > 5 && (
+              <p className="text-xs text-gray-400 text-center py-1">+{overdueInvoices.length - 5} more overdue invoices</p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Global Schedules */}
       <div className="section-card mb-6">
