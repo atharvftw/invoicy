@@ -44,7 +44,7 @@ const WORKSPACE_ITEMS: NavItem[] = [
   { href: "/invoices", label: "Invoices", icon: <FileText size={16} />, activePaths: ["/invoices", "/invoice"] },
   { href: "/clients", label: "Clients", icon: <Users size={16} /> },
   { href: "/recurring", label: "Recurring Billing", icon: <Repeat size={16} /> },
-  { href: "/reminders", label: "Reminders", icon: <Bell size={16} />, disabled: true },
+  { href: "/reminders", label: "Reminders", icon: <Bell size={16} /> },
   { href: "/payments", label: "Payment Tracking", icon: <CreditCard size={16} />, disabled: true },
   { href: "/reports", label: "Reports & Analytics", icon: <BarChart3 size={16} />, disabled: true },
 ];

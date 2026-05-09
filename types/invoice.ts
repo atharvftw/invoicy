@@ -63,6 +63,35 @@ export interface RecurringSchedule {
   created_at: string;
 }
 
+export type ReminderChannel = "email" | "whatsapp" | "both";
+export type ReminderTone = "friendly" | "firm";
+export type ReminderTrigger = "pre_due" | "due_date" | "overdue";
+
+export interface ReminderSchedule {
+  id: string;
+  trigger: ReminderTrigger;
+  daysOffset: number; // days before/after trigger
+  channel: ReminderChannel;
+  active: boolean;
+  created_at: string;
+}
+
+export interface ReminderTemplate {
+  id: string;
+  trigger: ReminderTrigger;
+  tone: ReminderTone;
+  subject: string;
+  body: string;
+  active: boolean;
+}
+
+export interface LateFeeConfig {
+  enabled: boolean;
+  type: "percentage" | "fixed";
+  value: number;
+  gracePeriodDays: number;
+}
+
 export interface Invoice {
   id: string;
   invoice_number: string;

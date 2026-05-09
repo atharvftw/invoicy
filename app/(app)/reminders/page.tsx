@@ -1,0 +1,208 @@
+"use client";
+
+import { useState } from "react";
+import { Bell, Mail, MessageCircle, Plus, Trash2, ToggleLeft, ToggleRight, AlertTriangle, Percent, IndianRupee, Clock, X } from "lucide-react";
+import { useReminderStore } from "@/store/reminderStore";
+import { ReminderTrigger, ReminderChannel, ReminderTone } from "@/types/invoice";
+import { cn } from "@/lib/utils";
+
+const TRIGGER_LABELS: Record<ReminderTrigger, string> = {
+  pre_due: "Before Due Date",
+  due_date: "On Due Date",
+  overdue: "After Due Date",
+};
+
+const CHANNEL_LABELS: Record<ReminderChannel, string> = {
+  email: "Email",
+  whatsapp: "WhatsApp",
+  both: "Email + WhatsApp",
+};
+
+const CHANNEL_ICONS: Record<ReminderChannel, React.ReactNode> = {
+  email: <Mail size={14} />,
+  whatsapp: <MessageCircle size={14} />,
+  both: <><Mail size={14} /><MessageCircle size={14} /></>,
+};
+
+export default function RemindersPage() {
+  const { schedules, templates, lateFee, addSchedule, deleteSchedule, toggleSchedule, updateTemplate, setLateFee } = useReminderStore();
+  const [scheduleModal, setScheduleModal] = useState(false);
+  const [editingTemplate, setEditingTemplate] = useState<string | null>(null);
+  const [form, setForm] = useState({
+    trigger: "pre_due" as ReminderTrigger,
+    daysOffset: 3,
+    channel: "email" as ReminderChannel,
+  });
+
+  function handleAddSchedule(e: React.FormEvent) {
+    e.preventDefault();
+    addSchedule({ ...form, active: true });
+    setScheduleModal(false);
+    setForm({ trigger: "pre_due", daysOffset: 3, channel: "email" });
+  }
+
+  return (
+    <div className="max-w-5xl mx-auto px-3 sm:px-6 py-6">
+      <div className="mb-6">
+        <h1 className="text-xl font-bold text-gray-900">Reminder Automation</h1>
+        <p className="text-sm text-gray-500 mt-1">Configure when and how clients receive payment reminders.</p>
+      </div>
+
+      {/* Global Schedules */}
+      <div className="section-card mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-gray-900">Reminder Schedules</h3>
+          <button onClick={() => setScheduleModal(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors">
+            <Plus size={13} /> Add Schedule
+          </button>
+        </div>
+        <div className="space-y-2">
+          {schedules.map((s) => (
+            <div key={s.id} className="flex items-center justify-between px-4 py-3 rounded-xl border border-gray-100 bg-gray-50/50">
+              <div className="flex items-center gap-3">
+                <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center shrink-0", s.active ? "bg-indigo-50 text-indigo-600" : "bg-gray-100 text-gray-400")}>
+                  <Bell size={14} />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-800">{TRIGGER_LABELS[s.trigger]}</p>
+                  <p className="text-xs text-gray-400 flex items-center gap-1">
+                    <Clock size={11} />
+                    {s.trigger === "pre_due" ? `${s.daysOffset} days before` : s.trigger === "overdue" ? `${s.daysOffset} days after` : "On the day"}
+                    <span className="mx-1">·</span>
+                    <span className="flex items-center gap-1">{CHANNEL_ICONS[s.channel]} {CHANNEL_LABELS[s.channel]}</span>
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={() => toggleSchedule(s.id)} className="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors" title={s.active ? "Pause" : "Resume"}>
+                  {s.active ? <ToggleRight size={20} className="text-indigo-600" /> : <ToggleLeft size={20} />}
+                </button>
+                <button onClick={() => { if (confirm("Delete this schedule?")) deleteSchedule(s.id); }} className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Delete">
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Templates */}
+      <div className="section-card mb-6">
+        <h3 className="text-sm font-semibold text-gray-900 mb-4">Message Templates</h3>
+        <div className="space-y-3">
+          {templates.map((t) => (
+            <div key={t.id} className="border border-gray-100 rounded-xl overflow-hidden">
+              <div className="px-4 py-3 bg-gray-50 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className={cn("badge text-[10px]", t.tone === "friendly" ? "bg-green-100 text-green-700" : "bg-rose-100 text-rose-700")}>{t.tone}</span>
+                  <span className="text-sm font-medium text-gray-800">{TRIGGER_LABELS[t.trigger]}</span>
+                </div>
+                <button onClick={() => setEditingTemplate(editingTemplate === t.id ? null : t.id)} className="text-xs text-indigo-600 hover:text-indigo-700 font-medium">
+                  {editingTemplate === t.id ? "Close" : "Edit"}
+                </button>
+              </div>
+              {editingTemplate === t.id ? (
+                <div className="px-4 py-3 space-y-3">
+                  <div>
+                    <label className="label-base">Subject</label>
+                    <input className="input-base" value={t.subject} onChange={(e) => updateTemplate(t.id, { subject: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="label-base">Body</label>
+                    <textarea className="input-base min-h-[100px]" value={t.body} onChange={(e) => updateTemplate(t.id, { body: e.target.value })} />
+                  </div>
+                  <p className="text-[10px] text-gray-400">Variables: {'{client_name}'}, {'{invoice_number}'}, {'{total}'}, {'{due_date}'}</p>
+                </div>
+              ) : (
+                <div className="px-4 py-3">
+                  <p className="text-sm font-medium text-gray-700">{t.subject}</p>
+                  <p className="text-xs text-gray-400 mt-1 line-clamp-2">{t.body}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Late Fees */}
+      <div className="section-card">
+        <div className="flex items-center gap-2 mb-4">
+          <AlertTriangle size={16} className="text-amber-500" />
+          <h3 className="text-sm font-semibold text-gray-900">Late Fee Setup</h3>
+        </div>
+        <div className="flex items-center gap-3 mb-4">
+          <button
+            onClick={() => setLateFee({ ...lateFee, enabled: !lateFee.enabled })}
+            className={cn("w-11 h-6 rounded-full transition-colors relative", lateFee.enabled ? "bg-indigo-600" : "bg-gray-300")}
+          >
+            <span className={cn("absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform", lateFee.enabled ? "translate-x-5" : "translate-x-0")} />
+          </button>
+          <span className="text-sm text-gray-700">{lateFee.enabled ? "Enabled" : "Disabled"}</span>
+        </div>
+        {lateFee.enabled && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="label-base">Type</label>
+              <div className="flex items-center gap-2">
+                <button onClick={() => setLateFee({ ...lateFee, type: "percentage" })} className={cn("flex-1 px-3 py-2 rounded-lg text-sm font-medium border transition-colors", lateFee.type === "percentage" ? "bg-indigo-50 border-indigo-200 text-indigo-700" : "bg-white border-gray-200 text-gray-600")}>
+                  <Percent size={14} className="inline mr-1" /> Percentage
+                </button>
+                <button onClick={() => setLateFee({ ...lateFee, type: "fixed" })} className={cn("flex-1 px-3 py-2 rounded-lg text-sm font-medium border transition-colors", lateFee.type === "fixed" ? "bg-indigo-50 border-indigo-200 text-indigo-700" : "bg-white border-gray-200 text-gray-600")}>
+                  <IndianRupee size={14} className="inline mr-1" /> Fixed
+                </button>
+              </div>
+            </div>
+            <div>
+              <label className="label-base">Value</label>
+              <input type="number" min={0} step={lateFee.type === "percentage" ? 0.1 : 1} className="input-base" value={lateFee.value} onChange={(e) => setLateFee({ ...lateFee, value: Number(e.target.value) })} />
+            </div>
+            <div>
+              <label className="label-base">Grace Period (days)</label>
+              <input type="number" min={0} className="input-base" value={lateFee.gracePeriodDays} onChange={(e) => setLateFee({ ...lateFee, gracePeriodDays: Number(e.target.value) })} />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Schedule Modal */}
+      {scheduleModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm">
+          <div className="bg-white rounded-xl border border-gray-100 shadow-xl w-full max-w-sm">
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-gray-900">Add Schedule</h3>
+              <button onClick={() => setScheduleModal(false)} className="text-gray-400 hover:text-gray-600"><X size={16} /></button>
+            </div>
+            <form onSubmit={handleAddSchedule} className="px-5 py-4 space-y-4">
+              <div>
+                <label className="label-base">Trigger</label>
+                <select className="input-base" value={form.trigger} onChange={(e) => setForm({ ...form, trigger: e.target.value as ReminderTrigger })}>
+                  <option value="pre_due">Before Due Date</option>
+                  <option value="due_date">On Due Date</option>
+                  <option value="overdue">After Due Date</option>
+                </select>
+              </div>
+              {form.trigger !== "due_date" && (
+                <div>
+                  <label className="label-base">Days {form.trigger === "pre_due" ? "Before" : "After"}</label>
+                  <input type="number" min={1} required className="input-base" value={form.daysOffset} onChange={(e) => setForm({ ...form, daysOffset: Number(e.target.value) })} />
+                </div>
+              )}
+              <div>
+                <label className="label-base">Channel</label>
+                <select className="input-base" value={form.channel} onChange={(e) => setForm({ ...form, channel: e.target.value as ReminderChannel })}>
+                  <option value="email">Email</option>
+                  <option value="whatsapp">WhatsApp</option>
+                  <option value="both">Email + WhatsApp</option>
+                </select>
+              </div>
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button type="button" onClick={() => setScheduleModal(false)} className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Cancel</button>
+                <button type="submit" className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition-colors">Add</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
