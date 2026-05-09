@@ -34,7 +34,10 @@ export interface Client {
   email: string;
   address: string;
   phone: string;
+  gstin?: string;
+  notes?: string;
   created_at: string;
+  updated_at?: string;
 }
 
 export interface Recurrence {

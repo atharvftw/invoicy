@@ -26,7 +26,7 @@ export default function ClientAutocomplete({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const clients = useClientStore((s) => s.clients);
-  const saveClient = useClientStore((s) => s.saveClient);
+  const addClient = useClientStore((s) => s.addClient);
 
   const filtered = query.trim()
     ? clients
@@ -40,11 +40,11 @@ export default function ClientAutocomplete({
     setOpen(false);
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!currentName) return;
     setSaving(true);
     try {
-      const client = await saveClient({
+      const client = addClient({
         name: currentName,
         email: currentEmail ?? "",
         address: currentAddress ?? "",
