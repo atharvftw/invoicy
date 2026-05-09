@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   Search,
@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils";
 
 export default function ClientsPage() {
   const router = useRouter();
-  const { clients, addClient, deleteClient } = useClientStore();
+  const { clients, addClient, deleteClient, updateClient } = useClientStore();
   const { invoices } = useInvoiceStore();
   const [search, setSearch] = useState("");
   const [openMenu, setOpenMenu] = useState<string | null>(null);
@@ -35,7 +35,11 @@ export default function ClientsPage() {
     address: "",
     gstin: "",
     notes: "",
+    tags: "",
   });
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkMenuOpen, setBulkMenuOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const { allIntelligence } = useClientIntelligence();
 
@@ -71,8 +75,8 @@ export default function ClientsPage() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.name.trim()) return;
-    addClient({ ...form });
-    setForm({ name: "", email: "", phone: "", address: "", gstin: "", notes: "" });
+    addClient({ ...form, tags: form.tags ? form.tags.split(",").map((t) => t.trim()).filter(Boolean) : undefined });
+    setForm({ name: "", email: "", phone: "", address: "", gstin: "", notes: "", tags: "" });
     setModalOpen(false);
   }
 
@@ -113,22 +117,119 @@ export default function ClientsPage() {
           />
         </div>
         <div className="flex items-center gap-2">
+          <input
+            type="file"
+            accept=".csv"
+            className="hidden"
+            ref={fileInputRef}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onload = (event) => {
+                const text = event.target?.result as string;
+                const lines = text.split("\n").filter((l) => l.trim());
+                const headers = lines[0].split(",").map((h) => h.trim().toLowerCase());
+                const nameIdx = headers.indexOf("name");
+                const emailIdx = headers.indexOf("email");
+                const phoneIdx = headers.indexOf("phone");
+                const addressIdx = headers.indexOf("address");
+                const gstinIdx = headers.indexOf("gstin");
+                if (nameIdx === -1) { alert("CSV must have a 'name' column"); return; }
+                let count = 0;
+                for (let i = 1; i < lines.length; i++) {
+                  const cols = lines[i].split(",").map((c) => c.trim().replace(/^"|"$/g, ""));
+                  if (!cols[nameIdx]) continue;
+                  addClient({
+                    name: cols[nameIdx],
+                    email: cols[emailIdx] || "",
+                    phone: cols[phoneIdx] || "",
+                    address: cols[addressIdx] || "",
+                    gstin: cols[gstinIdx] || "",
+                  });
+                  count++;
+                }
+                alert(`${count} clients imported`);
+              };
+              reader.readAsText(file);
+              e.target.value = "";
+            }}
+          />
           <button
-            disabled
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-400 cursor-not-allowed opacity-50"
-            title="Coming soon"
+            onClick={() => fileInputRef.current?.click()}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
           >
             <Upload size={14} /> Import CSV
           </button>
           <button
-            disabled
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-400 cursor-not-allowed opacity-50"
-            title="Coming soon"
+            onClick={() => {
+              const rows = [
+                ["Name", "Email", "Phone", "Address", "GSTIN", "Tags"],
+                ...clients.map((c) => [
+                  c.name,
+                  c.email,
+                  c.phone,
+                  c.address,
+                  c.gstin || "",
+                  (c.tags || []).join(";"),
+                ]),
+              ];
+              const csv = rows.map((r) => r.map((c) => `"${c.replace(/"/g, '""')}"`).join(",")).join("\n");
+              const blob = new Blob([csv], { type: "text/csv" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `clients-${new Date().toISOString().split("T")[0]}.csv`;
+              a.click();
+              URL.revokeObjectURL(url);
+            }}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
           >
             <Download size={14} /> Export
           </button>
         </div>
       </div>
+
+      {/* Bulk Action Bar */}
+      {selectedIds.size > 0 && (
+        <div className="flex items-center gap-3 mb-4 px-4 py-2.5 rounded-lg bg-indigo-50 border border-indigo-100">
+          <span className="text-sm font-medium text-indigo-900">{selectedIds.size} selected</span>
+          <div className="flex-1" />
+          <button
+            onClick={() => {
+              const tag = prompt("Add tag to selected clients:", "vip");
+              if (!tag) return;
+              Array.from(selectedIds).forEach((id) => {
+                const client = clients.find((c) => c.id === id);
+                if (client) {
+                  const existing = client.tags || [];
+                  if (!existing.includes(tag)) {
+                    updateClient(id, { tags: [...existing, tag] });
+                  }
+                }
+              });
+              setSelectedIds(new Set());
+            }}
+            className="px-3 py-1.5 rounded-lg bg-white border border-indigo-200 text-xs font-medium text-indigo-700 hover:bg-indigo-50 transition-colors"
+          >
+            Add Tag
+          </button>
+          <button
+            onClick={() => {
+              if (confirm(`Delete ${selectedIds.size} clients?`)) {
+                Array.from(selectedIds).forEach((id) => deleteClient(id));
+                setSelectedIds(new Set());
+              }
+            }}
+            className="px-3 py-1.5 rounded-lg bg-white border border-red-200 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
+          >
+            Delete
+          </button>
+          <button onClick={() => setSelectedIds(new Set())} className="text-xs text-gray-500 hover:text-gray-700">
+            Clear
+          </button>
+        </div>
+      )}
 
       {/* Table */}
       {filtered.length === 0 ? (
@@ -138,6 +239,20 @@ export default function ClientsPage() {
           <table className="w-full min-w-[560px]">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50">
+                <th className="px-4 py-3 w-10">
+                  <input
+                    type="checkbox"
+                    checked={filtered.length > 0 && filtered.every((c) => selectedIds.has(c.id))}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedIds(new Set(filtered.map((c) => c.id)));
+                      } else {
+                        setSelectedIds(new Set());
+                      }
+                    }}
+                    className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  />
+                </th>
                 <th className="text-left text-xs font-semibold text-gray-400 uppercase tracking-wide px-4 py-3">
                   Client
                 </th>
@@ -171,6 +286,19 @@ export default function ClientsPage() {
                     className="hover:bg-gray-50/60 transition-colors group cursor-pointer"
                     onClick={() => router.push(`/clients/${client.id}`)}
                   >
+                    <td className="px-4 py-3.5" onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(client.id)}
+                        onChange={(e) => {
+                          const next = new Set(selectedIds);
+                          if (e.target.checked) next.add(client.id);
+                          else next.delete(client.id);
+                          setSelectedIds(next);
+                        }}
+                        className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                      />
+                    </td>
                     <td className="px-4 py-3.5">
                       <div className="flex items-center gap-2.5">
                         <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0 text-indigo-600 font-semibold text-xs">
@@ -266,6 +394,10 @@ export default function ClientsPage() {
               <div>
                 <label className="label-base">Notes</label>
                 <textarea className="input-base min-h-[60px]" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Internal notes…" />
+              </div>
+              <div>
+                <label className="label-base">Tags</label>
+                <input className="input-base" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder="agency, vip, slow-payer (comma separated)" />
               </div>
               <div className="flex items-center justify-end gap-2 pt-2">
                 <button type="button" onClick={() => setModalOpen(false)} className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
