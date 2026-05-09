@@ -3,6 +3,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { generateId } from "@/lib/uuid";
 import { Client } from "@/types/invoice";
+import { useAuditStore } from "./auditStore";
 
 interface ClientStore {
   clients: Client[];
@@ -34,6 +35,7 @@ export const useClientStore = create<ClientStore>()(
           updated_at: now,
         };
         set({ clients: [...get().clients, client] });
+        useAuditStore.getState().log("added client", client.name, client.id);
         // Fire-and-forget sync
         fetch("/api/clients", {
           method: "POST",
@@ -58,8 +60,10 @@ export const useClientStore = create<ClientStore>()(
         }
       },
       deleteClient: (id) => {
+        const client = get().getClient(id);
         set({ clients: get().clients.filter((c) => c.id !== id) });
         fetch(`/api/clients/${id}`, { method: "DELETE" }).catch(() => {});
+        if (client) useAuditStore.getState().log("deleted client", client.name, client.id);
       },
       getClient: (id) => get().clients.find((c) => c.id === id),
     }),

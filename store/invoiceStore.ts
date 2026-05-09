@@ -8,6 +8,7 @@ import {
   createEmptyInvoice,
   calculateInvoiceTotals,
 } from "@/types/invoice";
+import { useAuditStore } from "./auditStore";
 
 interface InvoiceStore {
   invoices: Invoice[];
@@ -66,6 +67,7 @@ export const useInvoiceStore = create<InvoiceStore>()(
 
         // Fire-and-forget sync to Turso
         get().pushToServer(saved);
+        useAuditStore.getState().log("saved invoice", saved.invoice_number || "Draft", saved.id);
         return calculated.id;
       },
 
@@ -103,8 +105,10 @@ export const useInvoiceStore = create<InvoiceStore>()(
       },
 
       deleteInvoice: (id) => {
+        const inv = get().invoices.find((i) => i.id === id);
         set({ invoices: get().invoices.filter((i) => i.id !== id) });
         fetch(`/api/invoices/${id}`, { method: "DELETE" }).catch(() => {});
+        if (inv) useAuditStore.getState().log("deleted invoice", inv.invoice_number || "Draft", inv.id);
       },
 
       duplicateInvoice: (id) => {
@@ -124,6 +128,7 @@ export const useInvoiceStore = create<InvoiceStore>()(
         const updated = [...get().invoices, duplicate];
         set({ invoices: updated });
         get().pushToServer(duplicate);
+        useAuditStore.getState().log("duplicated invoice", duplicate.invoice_number, duplicate.id);
         return newId;
       },
 
@@ -141,7 +146,10 @@ export const useInvoiceStore = create<InvoiceStore>()(
         );
         set({ invoices: updated });
         const paid = updated.find((i) => i.id === id);
-        if (paid) get().pushToServer(paid);
+        if (paid) {
+          get().pushToServer(paid);
+          useAuditStore.getState().log("marked invoice as paid", paid.invoice_number, paid.id);
+        }
       },
 
       updateStatus: (id, status) => {

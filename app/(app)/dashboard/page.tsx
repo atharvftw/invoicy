@@ -12,8 +12,10 @@ import {
   Zap,
   Bell,
   Calendar,
+  Activity,
 } from "lucide-react";
 import { useInvoiceStore } from "@/store/invoiceStore";
+import { useAuditStore } from "@/store/auditStore";
 import {
   InvoiceStatus,
   STATUS_LABELS,
@@ -26,6 +28,7 @@ import { cn } from "@/lib/utils";
 export default function DashboardPage() {
   const router = useRouter();
   const { invoices } = useInvoiceStore();
+  const { entries } = useAuditStore();
 
   const stats = useMemo(() => {
     const now = new Date();
@@ -151,21 +154,18 @@ export default function DashboardPage() {
               label="Send Reminders"
               description="Follow up on pending payments"
               onClick={() => router.push("/reminders")}
-              disabled
             />
             <QuickActionCard
               icon={<Zap size={18} className="text-emerald-600" />}
               label="Setup Recurring"
               description="Automate repeat billing"
               onClick={() => router.push("/recurring")}
-              disabled
             />
             <QuickActionCard
               icon={<Calendar size={18} className="text-blue-600" />}
               label="View Reports"
               description="Analyze revenue trends"
               onClick={() => router.push("/reports")}
-              disabled
             />
           </div>
 
@@ -203,56 +203,28 @@ export default function DashboardPage() {
         {/* Recent Activity */}
         <div className="section-card">
           <h3 className="text-sm font-semibold text-gray-900 mb-4">Recent Activity</h3>
-          {recentInvoices.length === 0 ? (
+          {entries.length === 0 ? (
             <EmptyActivity />
           ) : (
             <div className="space-y-3">
-              {recentInvoices.map((inv) => (
+              {entries.slice(0, 8).map((entry) => (
                 <div
-                  key={inv.id}
-                  className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-gray-50/60"
+                  key={entry.id}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-50/60"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div
-                      className={cn(
-                        "w-8 h-8 rounded-lg flex items-center justify-center shrink-0",
-                        inv.status === "paid"
-                          ? "bg-green-50"
-                          : inv.status === "overdue"
-                          ? "bg-rose-50"
-                          : inv.status === "draft"
-                          ? "bg-gray-50"
-                          : "bg-blue-50"
-                      )}
-                    >
-                      <FileText
-                        size={14}
-                        className={cn(
-                          inv.status === "paid"
-                            ? "text-green-600"
-                            : inv.status === "overdue"
-                            ? "text-rose-600"
-                            : inv.status === "draft"
-                            ? "text-gray-500"
-                            : "text-blue-600"
-                        )}
-                      />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-gray-800 truncate">
-                        {inv.invoice_number || "Draft"}
-                      </p>
-                      <p className="text-xs text-gray-400">{inv.bill_to.name || "—"}</p>
-                    </div>
+                  <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0">
+                    <Activity size={14} className="text-indigo-500" />
                   </div>
-                  <div className="text-right shrink-0 ml-3">
-                    <span className={cn("badge text-[10px]", STATUS_COLORS[inv.status])}>
-                      {STATUS_LABELS[inv.status]}
-                    </span>
-                    <p className="text-[11px] text-gray-400 mt-1">
-                      {formatDate(inv.created_at.split("T")[0])}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm text-gray-700">
+                      <span className="font-medium text-gray-900">{entry.actor}</span>{" "}
+                      {entry.action}{" "}
+                      <span className="font-medium text-gray-900">{entry.target}</span>
                     </p>
                   </div>
+                  <p className="text-[11px] text-gray-400 shrink-0">
+                    {new Date(entry.timestamp).toLocaleDateString("en-IN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                  </p>
                 </div>
               ))}
             </div>

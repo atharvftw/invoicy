@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { generateId } from "@/lib/uuid";
 import { PaymentTransaction } from "@/types/invoice";
+import { useAuditStore } from "./auditStore";
 
 interface PaymentStore {
   transactions: PaymentTransaction[];
@@ -25,6 +26,7 @@ export const usePaymentStore = create<PaymentStore>()(
           created_at: new Date().toISOString(),
         };
         set({ transactions: [...get().transactions, tx] });
+        useAuditStore.getState().log("recorded payment", `${tx.clientName} · ₹${tx.amount}`, tx.id);
         return tx;
       },
       updateTransaction: (id, updates) => {
