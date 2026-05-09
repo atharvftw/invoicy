@@ -50,8 +50,8 @@ const WORKSPACE_ITEMS: NavItem[] = [
 ];
 
 const CONFIG_ITEMS: NavItem[] = [
-  { href: "/templates", label: "Templates", icon: <Palette size={16} />, disabled: true },
-  { href: "/team", label: "Team Management", icon: <UsersRound size={16} />, disabled: true },
+  { href: "/templates", label: "Templates", icon: <Palette size={16} /> },
+  { href: "/team", label: "Team Management", icon: <UsersRound size={16} /> },
   { href: "/settings", label: "Integrations & Settings", icon: <Settings size={16} /> },
 ];
 
