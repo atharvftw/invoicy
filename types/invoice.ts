@@ -92,6 +92,20 @@ export interface LateFeeConfig {
   gracePeriodDays: number;
 }
 
+export interface PaymentTransaction {
+  id: string;
+  invoiceId?: string;
+  clientName: string;
+  amount: number;
+  currency: Currency;
+  method: "upi" | "bank_transfer" | "cash" | "card" | "other";
+  reference?: string;
+  date: string;
+  matched: boolean;
+  notes?: string;
+  created_at: string;
+}
+
 export interface Invoice {
   id: string;
   invoice_number: string;
