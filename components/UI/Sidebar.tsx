@@ -48,6 +48,7 @@ const WORKSPACE_ITEMS: NavItem[] = [
   { href: "/reminders", label: "Reminders", icon: <Bell size={16} /> },
   { href: "/payments", label: "Payment Tracking", icon: <CreditCard size={16} /> },
   { href: "/reports", label: "Reports & Analytics", icon: <BarChart3 size={16} /> },
+  { href: "/subscription", label: "Subscription", icon: <Crown size={16} /> },
 ];
 
 const CONFIG_ITEMS: NavItem[] = [

@@ -3,17 +3,19 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { generateId } from "@/lib/uuid";
-import { ReminderSchedule, ReminderTemplate, LateFeeConfig, ReminderTrigger, ReminderChannel, ReminderTone } from "@/types/invoice";
+import { ReminderSchedule, ReminderTemplate, LateFeeConfig, ReminderSendRecord, ReminderTrigger, ReminderChannel, ReminderTone } from "@/types/invoice";
 
 interface ReminderStore {
   schedules: ReminderSchedule[];
   templates: ReminderTemplate[];
   lateFee: LateFeeConfig;
+  sendHistory: ReminderSendRecord[];
   addSchedule: (data: Omit<ReminderSchedule, "id" | "created_at">) => void;
   deleteSchedule: (id: string) => void;
   toggleSchedule: (id: string) => void;
   updateTemplate: (id: string, updates: Partial<Omit<ReminderTemplate, "id">>) => void;
   setLateFee: (config: LateFeeConfig) => void;
+  recordSend: (record: Omit<ReminderSendRecord, "id" | "sentAt">) => void;
 }
 
 const defaultTemplates: ReminderTemplate[] = [
@@ -53,6 +55,7 @@ export const useReminderStore = create<ReminderStore>()(
       ],
       templates: defaultTemplates,
       lateFee: { enabled: false, type: "percentage", value: 1.5, gracePeriodDays: 7 },
+      sendHistory: [],
       addSchedule: (data) => {
         const schedule: ReminderSchedule = {
           id: generateId(),
@@ -79,6 +82,14 @@ export const useReminderStore = create<ReminderStore>()(
         });
       },
       setLateFee: (config) => set({ lateFee: config }),
+      recordSend: (record) => {
+        const fullRecord: ReminderSendRecord = {
+          id: generateId(),
+          ...record,
+          sentAt: new Date().toISOString(),
+        };
+        set({ sendHistory: [fullRecord, ...get().sendHistory].slice(0, 200) });
+      },
     }),
     { name: "invoicy-reminders" }
   )

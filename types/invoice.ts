@@ -77,6 +77,7 @@ export interface RecurringSchedule {
 export type ReminderChannel = "email" | "whatsapp" | "both";
 export type ReminderTone = "friendly" | "firm";
 export type ReminderTrigger = "pre_due" | "due_date" | "overdue";
+export type EmailTone = "professional" | "casual" | "firm" | "friendly" | "urgent";
 
 export interface ReminderSchedule {
   id: string;
@@ -101,6 +102,18 @@ export interface LateFeeConfig {
   type: "percentage" | "fixed";
   value: number;
   gracePeriodDays: number;
+}
+
+export interface ReminderSendRecord {
+  id: string;
+  invoiceId: string;
+  invoiceNumber: string;
+  clientEmail: string;
+  templateId: string;
+  subject: string;
+  sentAt: string;
+  status: "sent" | "failed";
+  error?: string;
 }
 
 export interface PaymentTransaction {

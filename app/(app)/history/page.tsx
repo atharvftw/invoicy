@@ -14,8 +14,13 @@ import {
   TrendingUp,
   Clock,
   DollarSign,
+  Send,
+  Mail,
 } from "lucide-react";
 import { useInvoiceStore } from "@/store/invoiceStore";
+import { useReminderStore } from "@/store/reminderStore";
+import { useAuditStore } from "@/store/auditStore";
+import { useEmailStore } from "@/store/emailStore";
 import {
   Invoice,
   InvoiceStatus,
@@ -31,9 +36,13 @@ export default function HistoryPage() {
   const router = useRouter();
   const { invoices, deleteInvoice, duplicateInvoice, markAsPaid, loadInvoice } =
     useInvoiceStore();
+  const { templates, recordSend } = useReminderStore();
+  const { log } = useAuditStore();
+  const { smtp } = useEmailStore();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | "all">("all");
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [sendingId, setSendingId] = useState<string | null>(null);
 
   // Stats
   const totalRevenue = invoices
@@ -90,6 +99,81 @@ export default function HistoryPage() {
   function handleMarkPaid(id: string) {
     markAsPaid(id);
     setOpenMenu(null);
+  }
+
+  async function handleSendReminder(inv: Invoice) {
+    if (!smtp) {
+      alert("Email not configured. Go to Settings → Email to connect your email account.");
+      setOpenMenu(null);
+      return;
+    }
+    if (!inv.bill_to.email) {
+      alert("Client email is missing. Update the client to add an email address.");
+      setOpenMenu(null);
+      return;
+    }
+    const templateId = inv.status === "overdue" ? "t-overdue-firm" : inv.status === "sent" || inv.status === "partially_paid" ? "t-due-friendly" : "t-pre-friendly";
+    const template = templates.find((t) => t.id === templateId) ?? templates[0];
+    if (!template) {
+      alert("No reminder template found.");
+      setOpenMenu(null);
+      return;
+    }
+    setSendingId(inv.id);
+    setOpenMenu(null);
+    try {
+      const res = await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: inv.bill_to.email,
+          invoice: inv,
+          subject: template.subject,
+          body: template.body,
+          fromName: inv.from.name,
+          smtp,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        recordSend({
+          invoiceId: inv.id,
+          invoiceNumber: inv.invoice_number || "Draft",
+          clientEmail: inv.bill_to.email,
+          templateId: template.id,
+          subject: template.subject,
+          status: "sent",
+        });
+        log("sent email reminder", `${inv.invoice_number || "Draft"} → ${inv.bill_to.email}`, inv.id);
+        alert(`Reminder sent to ${inv.bill_to.email}`);
+      } else {
+        recordSend({
+          invoiceId: inv.id,
+          invoiceNumber: inv.invoice_number || "Draft",
+          clientEmail: inv.bill_to.email,
+          templateId: template.id,
+          subject: template.subject,
+          status: "failed",
+          error: data.error || "Unknown error",
+        });
+        log("failed to send reminder", `${inv.invoice_number || "Draft"}`, inv.id);
+        alert(`Failed: ${data.error || "Unknown error"}`);
+      }
+    } catch (err) {
+      recordSend({
+        invoiceId: inv.id,
+        invoiceNumber: inv.invoice_number || "Draft",
+        clientEmail: inv.bill_to.email,
+        templateId: template.id,
+        subject: template.subject,
+        status: "failed",
+        error: err instanceof Error ? err.message : "Network error",
+      });
+      log("failed to send reminder", `${inv.invoice_number || "Draft"}`, inv.id);
+      alert("Network error sending reminder.");
+    } finally {
+      setSendingId(null);
+    }
   }
 
   return (
@@ -284,6 +368,13 @@ export default function HistoryPage() {
                               label="Mark as Paid"
                               onClick={() => handleMarkPaid(inv.id)}
                               className="text-green-600"
+                            />
+                          )}
+                          {inv.status !== "paid" && inv.status !== "draft" && (
+                            <MenuButton
+                              icon={sendingId === inv.id ? <span className="w-3 h-3 border-2 border-indigo-300 border-t-indigo-600 rounded-full animate-spin inline-block" /> : <Mail size={13} />}
+                              label={sendingId === inv.id ? "Sending…" : "Send Reminder"}
+                              onClick={() => handleSendReminder(inv)}
                             />
                           )}
                           <MenuButton

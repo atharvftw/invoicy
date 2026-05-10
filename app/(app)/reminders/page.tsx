@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Bell, Mail, MessageCircle, Plus, Trash2, ToggleLeft, ToggleRight, AlertTriangle, Percent, IndianRupee, Clock, X, Bot, ChevronRight, ShieldAlert, Sparkles, Workflow, ArrowRight } from "lucide-react";
+import { Bell, Mail, MessageCircle, Plus, Trash2, ToggleLeft, ToggleRight, AlertTriangle, Percent, IndianRupee, Clock, X, Bot, ChevronRight, ShieldAlert, Sparkles, Workflow, ArrowRight, Send } from "lucide-react";
 import { useReminderStore } from "@/store/reminderStore";
 import { useInvoiceStore } from "@/store/invoiceStore";
 import { useClientIntelligence } from "@/hooks/useClientIntelligence";
+import { useEmailStore, EmailTone, TONE_DESCRIPTIONS, TONE_LABELS } from "@/store/emailStore";
 import { ReminderTrigger, ReminderChannel, ReminderTone, CURRENCY_SYMBOLS } from "@/types/invoice";
 import { cn } from "@/lib/utils";
+import { useAuditStore } from "@/store/auditStore";
 
 const TRIGGER_LABELS: Record<ReminderTrigger, string> = {
   pre_due: "Before Due Date",
@@ -27,11 +29,16 @@ const CHANNEL_ICONS: Record<ReminderChannel, React.ReactNode> = {
 };
 
 export default function RemindersPage() {
-  const { schedules, templates, lateFee, addSchedule, deleteSchedule, toggleSchedule, updateTemplate, setLateFee } = useReminderStore();
+  const { schedules, templates, lateFee, addSchedule, deleteSchedule, toggleSchedule, updateTemplate, setLateFee, recordSend } = useReminderStore();
   const { invoices } = useInvoiceStore();
   const { allIntelligence } = useClientIntelligence();
+  const { log } = useAuditStore();
+  const { smtp, defaultTone, setDefaultTone } = useEmailStore();
   const [scheduleModal, setScheduleModal] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<string | null>(null);
+  const [sendingId, setSendingId] = useState<string | null>(null);
+  const [selectedTone, setSelectedTone] = useState<EmailTone>(defaultTone);
+  const [generatingId, setGeneratingId] = useState<string | null>(null);
   const [form, setForm] = useState({
     trigger: "pre_due" as ReminderTrigger,
     daysOffset: 3,
@@ -58,6 +65,105 @@ export default function RemindersPage() {
     setForm({ trigger: "pre_due", daysOffset: 3, channel: "email" });
   }
 
+  async function generateEmail(invoiceId: string, tone: EmailTone): Promise<{ subject: string; body: string } | null> {
+    const invoice = invoices.find((i) => i.id === invoiceId);
+    if (!invoice) return null;
+    setGeneratingId(invoiceId);
+    try {
+      const res = await fetch("/api/generate-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ invoice, tone }),
+      });
+      const data = await res.json();
+      if (data.success) return { subject: data.subject, body: data.body };
+      return null;
+    } catch {
+      return null;
+    } finally {
+      setGeneratingId(null);
+    }
+  }
+
+  async function sendReminder(invoiceId: string, templateId: string) {
+    if (!smtp) {
+      alert("Email not configured. Go to Settings → Email to connect your email account.");
+      return;
+    }
+    const invoice = invoices.find((i) => i.id === invoiceId);
+    const template = templates.find((t) => t.id === templateId);
+    if (!invoice || !template || !invoice.bill_to.email) {
+      alert("Invoice or client email missing.");
+      return;
+    }
+    setSendingId(invoiceId);
+    let subject = template.subject;
+    let body = template.body;
+
+    // If tone is different from template default, generate with Gemini
+    if (selectedTone !== "friendly" && selectedTone !== "firm") {
+      const generated = await generateEmail(invoiceId, selectedTone);
+      if (generated) {
+        subject = generated.subject;
+        body = generated.body;
+      }
+    }
+
+    try {
+      const res = await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: invoice.bill_to.email,
+          invoice,
+          subject,
+          body,
+          fromName: invoice.from.name,
+          smtp,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        recordSend({
+          invoiceId: invoice.id,
+          invoiceNumber: invoice.invoice_number || "Draft",
+          clientEmail: invoice.bill_to.email,
+          templateId: template.id,
+          subject,
+          status: "sent",
+        });
+        log("sent email reminder", `${invoice.invoice_number || "Draft"} → ${invoice.bill_to.email}`, invoice.id);
+        alert(`Reminder sent to ${invoice.bill_to.email}`);
+      } else {
+        recordSend({
+          invoiceId: invoice.id,
+          invoiceNumber: invoice.invoice_number || "Draft",
+          clientEmail: invoice.bill_to.email,
+          templateId: template.id,
+          subject,
+          status: "failed",
+          error: data.error || "Unknown error",
+        });
+        log("failed to send reminder", `${invoice.invoice_number || "Draft"}`, invoice.id);
+        alert(`Failed to send: ${data.error || "Unknown error"}`);
+      }
+    } catch (err) {
+      recordSend({
+        invoiceId: invoice.id,
+        invoiceNumber: invoice.invoice_number || "Draft",
+        clientEmail: invoice.bill_to.email,
+        templateId: template.id,
+        subject,
+        status: "failed",
+        error: err instanceof Error ? err.message : "Network error",
+      });
+      log("failed to send reminder", `${invoice.invoice_number || "Draft"}`, invoice.id);
+      alert("Network error sending reminder.");
+    } finally {
+      setSendingId(null);
+    }
+  }
+
   return (
     <div className="max-w-5xl mx-auto px-3 sm:px-6 py-6">
       <div className="mb-6">
@@ -67,6 +173,48 @@ export default function RemindersPage() {
             ? "Your AI payment assistant is active and monitoring invoices."
             : "Your payment assistant is paused. Enable schedules to activate."}
         </p>
+      </div>
+
+      {/* Email config alert */}
+      {!smtp && (
+        <div className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200 flex items-center gap-3">
+          <AlertTriangle size={16} className="text-amber-600 shrink-0" />
+          <p className="text-sm text-amber-800">
+            Email not configured. <a href="/settings" className="font-medium underline">Connect your email</a> to send reminders.
+          </p>
+        </div>
+      )}
+
+      {/* Tone selector */}
+      <div className="section-card mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-gray-900">Email Tone</h3>
+          <span className="text-xs text-gray-400">{TONE_LABELS[selectedTone]}</span>
+        </div>
+        <div className="grid grid-cols-5 gap-2">
+          {(["professional", "casual", "firm", "friendly", "urgent"] as EmailTone[]).map((tone) => (
+            <button
+              key={tone}
+              onClick={() => { setSelectedTone(tone); setDefaultTone(tone); }}
+              className={cn(
+                "px-2 py-2 rounded-lg text-xs font-medium border transition-colors text-center",
+                selectedTone === tone
+                  ? "bg-indigo-50 border-indigo-200 text-indigo-700"
+                  : "bg-white border-gray-200 text-gray-600 hover:border-gray-300"
+              )}
+              title={TONE_DESCRIPTIONS[tone]}
+            >
+              {TONE_LABELS[tone]}
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-gray-400 mt-2">{TONE_DESCRIPTIONS[selectedTone]}</p>
+        {generatingId && (
+          <p className="text-xs text-indigo-500 mt-1 flex items-center gap-1">
+            <span className="w-3 h-3 border-2 border-indigo-300 border-t-indigo-600 rounded-full animate-spin inline-block" />
+            Gemini is drafting your email…
+          </p>
+        )}
       </div>
 
       {/* Smart Collections Agent — Overdue Monitor */}
@@ -103,6 +251,25 @@ export default function RemindersPage() {
                     <p className="text-xs font-medium text-indigo-700">{escalation}</p>
                     <p className="text-[10px] text-gray-400">{tone} tone · {channel}</p>
                   </div>
+                  {inv.bill_to.email && (
+                    <button
+                      onClick={() => sendReminder(inv.id, daysOverdue > 7 ? "t-overdue-firm" : "t-due-friendly")}
+                      disabled={sendingId === inv.id}
+                      className={cn(
+                        "p-2 rounded-lg transition-colors shrink-0",
+                        sendingId === inv.id
+                          ? "text-gray-300 cursor-not-allowed"
+                          : "text-indigo-500 hover:bg-indigo-50 hover:text-indigo-700"
+                      )}
+                      title="Send email reminder now"
+                    >
+                      {sendingId === inv.id ? (
+                        <span className="w-4 h-4 border-2 border-indigo-300 border-t-indigo-600 rounded-full animate-spin inline-block" />
+                      ) : (
+                        <Send size={16} />
+                      )}
+                    </button>
+                  )}
                 </div>
               );
             })}
