@@ -21,6 +21,7 @@ import {
   ChevronUp,
   Menu,
   Lock,
+  Sparkles,
 } from "lucide-react";
 import Logo from "@/components/Logo";
 import { useState } from "react";
@@ -188,9 +189,17 @@ export default function Sidebar() {
                 )}
 
                 {settingsOpen && (
-                  <div className="mx-1 mb-1 mt-0.5 rounded-lg border border-gray-100 bg-gray-50 p-2.5 overflow-hidden">
+                  <div className="mx-1 mb-1 mt-0.5 rounded-lg border border-gray-100 bg-gray-50 p-2.5 overflow-hidden space-y-2">
+                    <Link
+                      href="/onboarding"
+                      className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-white transition-colors"
+                      onClick={() => setSettingsOpen(false)}
+                    >
+                      <Sparkles size={13} className="text-amber-500 shrink-0" />
+                      <span className="text-[11px] font-medium text-gray-700">Setup Assistant</span>
+                    </Link>
                     {isPremium ? (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 px-2 py-1.5">
                         <Crown size={13} className="text-indigo-500 shrink-0" />
                         <div className="min-w-0">
                           <p className="text-[11px] font-semibold text-gray-800">Premium active</p>
@@ -198,7 +207,7 @@ export default function Sidebar() {
                         </div>
                       </div>
                     ) : (
-                      <div className="space-y-2">
+                      <div className="space-y-2 px-2 py-1.5">
                         <div className="flex items-center gap-1.5">
                           <Crown size={12} className="text-indigo-400 shrink-0" />
                           <p className="text-[11px] font-semibold text-gray-700">Unlock Premium</p>
