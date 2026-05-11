@@ -68,12 +68,31 @@ export default function RemindersPage() {
   async function generateEmail(invoiceId: string, tone: EmailTone): Promise<{ subject: string; body: string } | null> {
     const invoice = invoices.find((i) => i.id === invoiceId);
     if (!invoice) return null;
+
+    // Find client intelligence for behavioral context
+    const intel = allIntelligence.find((i) =>
+      i.client.name.toLowerCase() === invoice.bill_to.name.toLowerCase() ||
+      i.client.email.toLowerCase() === invoice.bill_to.email.toLowerCase()
+    )?.intelligence;
+
+    const daysOverdue = invoice.due_date
+      ? Math.max(0, Math.floor((Date.now() - new Date(invoice.due_date).getTime()) / (1000 * 60 * 60 * 24)))
+      : undefined;
+
     setGeneratingId(invoiceId);
     try {
       const res = await fetch("/api/generate-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ invoice, tone }),
+        body: JSON.stringify({
+          invoice,
+          tone,
+          context: intel ? {
+            riskScore: intel.riskScore,
+            avgDaysLate: intel.avgDaysLate,
+            daysOverdue,
+          } : undefined,
+        }),
       });
       const data = await res.json();
       if (data.success) return { subject: data.subject, body: data.body };

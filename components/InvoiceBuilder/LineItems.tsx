@@ -3,6 +3,7 @@
 import { Plus, Trash2 } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { Invoice, LineItem, CURRENCY_SYMBOLS } from "@/types/invoice";
+import TaxSuggestion from "./TaxSuggestion";
 
 interface Props {
   invoice: Invoice;
@@ -74,6 +75,10 @@ export default function LineItems({ invoice, onChange }: Props) {
                     value={item.name}
                     onChange={(e) => updateItem(item.id, "name", e.target.value)}
                     placeholder="Design services, consulting..."
+                  />
+                  <TaxSuggestion
+                    description={item.name}
+                    onApply={(rate) => onChange({ tax: rate })}
                   />
                 </td>
                 <td className="px-2 py-2">

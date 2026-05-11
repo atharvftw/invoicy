@@ -17,11 +17,31 @@ const TONE_PROMPTS: Record<EmailTone, string> = {
     "Write a serious, time-sensitive payment reminder email. Emphasize deadlines and consequences. Professional but convey that immediate action is required.",
 };
 
-function buildPrompt(tone: EmailTone, invoice: Invoice): string {
+function buildPrompt(
+  tone: EmailTone,
+  invoice: Invoice,
+  context?: {
+    riskScore?: number;
+    avgDaysLate?: number;
+    isVIP?: boolean;
+    daysOverdue?: number;
+  }
+): string {
   const base = TONE_PROMPTS[tone];
   const items = invoice.items
     .map((i) => `- ${i.name}: ${i.quantity} x ${i.amount} = ${i.quantity * i.amount}`)
     .join("\n");
+
+  const behavioralContext = context
+    ? `
+CLIENT BEHAVIORAL CONTEXT:
+- Risk Score: ${context.riskScore ?? "unknown"}/100 (higher = more likely to delay)
+- Average Days Late: ${context.avgDaysLate ?? "unknown"}
+- VIP Status: ${context.isVIP ? "Yes — treat with extra respect and flexibility" : "No"}
+- Days Overdue (current invoice): ${context.daysOverdue ?? "not overdue"}
+${context.daysOverdue && context.daysOverdue > 14 ? "- This is a chronic late payer. Escalate firmly but keep it professional." : ""}
+${context.isVIP ? "- This is a VIP client. Be respectful, offer payment plan options, avoid harsh language." : ""}`
+    : "";
 
   return `${base}
 
@@ -35,6 +55,7 @@ INVOICE CONTEXT:
 - Invoice Date: ${invoice.date}
 - Line Items:
 ${items}
+${behavioralContext}
 
 INSTRUCTIONS:
 1. Generate ONLY a subject line and email body.
@@ -57,13 +78,22 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { invoice, tone } = body as { invoice: Invoice; tone: EmailTone };
+    const { invoice, tone, context } = body as {
+      invoice: Invoice;
+      tone: EmailTone;
+      context?: {
+        riskScore?: number;
+        avgDaysLate?: number;
+        isVIP?: boolean;
+        daysOverdue?: number;
+      };
+    };
 
     if (!invoice || !tone) {
       return NextResponse.json({ error: "Missing invoice or tone" }, { status: 400 });
     }
 
-    const prompt = buildPrompt(tone, invoice);
+    const prompt = buildPrompt(tone, invoice, context);
 
     const res = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,

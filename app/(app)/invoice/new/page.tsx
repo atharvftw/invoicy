@@ -4,7 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { Save, CheckCircle, PanelRightClose, PanelRightOpen } from "lucide-react";
 import { useInvoiceStore } from "@/store/invoiceStore";
 import { useUIStore } from "@/store/uiStore";
-import { Invoice } from "@/types/invoice";
+import { Invoice, LineItem } from "@/types/invoice";
 import HeaderSection from "@/components/InvoiceBuilder/HeaderSection";
 import PartySection from "@/components/InvoiceBuilder/PartySection";
 import LineItems from "@/components/InvoiceBuilder/LineItems";
@@ -14,6 +14,7 @@ import SignatureSection from "@/components/InvoiceBuilder/SignatureSection";
 import InvoicePreview from "@/components/InvoicePreview/InvoicePreview";
 import PDFDownloadButton from "@/components/InvoicePreview/PDFDownloadButton";
 import GmailButton from "@/components/InvoicePreview/GmailButton";
+import VoiceInput from "@/components/InvoiceBuilder/VoiceInput";
 
 const PREVIEW_WIDTH = 560;
 
@@ -35,6 +36,63 @@ export default function NewInvoicePage() {
   );
 
   function handleSave() {
+    saveCurrentInvoice();
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  }
+
+  function handleVoiceParsed(data: {
+    invoice_number?: string | null;
+    client_name?: string;
+    client_email?: string | null;
+    line_items?: { name: string; quantity: number; amount: number }[];
+    subtotal?: number;
+    tax_rate?: number | null;
+    tax_amount?: number;
+    total?: number;
+    currency?: string;
+    due_date?: string | null;
+    payment_terms?: string | null;
+    notes?: string | null;
+  }) {
+    const updates: Partial<Invoice> = {};
+
+    if (data.invoice_number) updates.invoice_number = data.invoice_number;
+    if (data.client_name) {
+      updates.bill_to = {
+        ...currentInvoice.bill_to,
+        name: data.client_name,
+        email: data.client_email || currentInvoice.bill_to.email,
+      };
+    }
+    if (data.line_items && data.line_items.length > 0) {
+      const items: LineItem[] = data.line_items.map((item, idx) => {
+        const qty = item.quantity || 1;
+        return {
+          id: `vi-${Date.now()}-${idx}`,
+          name: item.name,
+          quantity: qty,
+          rate: item.amount / qty,
+          amount: item.amount,
+        };
+      });
+      updates.items = items;
+      updates.subtotal = data.subtotal || items.reduce((sum, i) => sum + i.amount * i.quantity, 0);
+    }
+    if (data.tax_rate !== undefined && data.tax_rate !== null) {
+      updates.tax = data.tax_rate;
+    }
+    if (data.total !== undefined) {
+      updates.total = data.total;
+    }
+    if (data.due_date) {
+      updates.due_date = data.due_date;
+    }
+    if (data.notes) {
+      updates.notes = data.notes;
+    }
+
+    updateCurrentInvoice(updates);
     saveCurrentInvoice();
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -80,6 +138,7 @@ export default function NewInvoicePage() {
 
         {/* Form sections */}
         <div className="px-3 sm:px-6 py-5 space-y-4 max-w-2xl">
+          <VoiceInput onParsed={handleVoiceParsed} />
           <HeaderSection invoice={currentInvoice} onChange={onChange} />
           <PartySection invoice={currentInvoice} onChange={onChange} />
           <LineItems invoice={currentInvoice} onChange={onChange} />
