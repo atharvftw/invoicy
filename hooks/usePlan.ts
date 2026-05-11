@@ -2,8 +2,14 @@
 
 import { useUser } from "@clerk/nextjs";
 
+export type PlanId = "free" | "pro" | "enterprise";
+
 export function usePlan() {
   const { user, isLoaded } = useUser();
-  const isPremium = isLoaded && user?.publicMetadata?.plan === "premium";
-  return { isPremium, isLoaded };
+  const planId = (user?.publicMetadata?.plan as PlanId) || "free";
+  const isPro = planId === "pro" || planId === "enterprise";
+  const isEnterprise = planId === "enterprise";
+  // Backwards compat
+  const isPremium = isPro || isEnterprise;
+  return { planId, isPro, isEnterprise, isPremium, isLoaded };
 }

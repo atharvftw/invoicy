@@ -15,6 +15,7 @@ import InvoicePreview from "@/components/InvoicePreview/InvoicePreview";
 import PDFDownloadButton from "@/components/InvoicePreview/PDFDownloadButton";
 import GmailButton from "@/components/InvoicePreview/GmailButton";
 import VoiceInput from "@/components/InvoiceBuilder/VoiceInput";
+import { PlanGate } from "@/components/PlanGate";
 
 const PREVIEW_WIDTH = 560;
 
@@ -138,7 +139,9 @@ export default function NewInvoicePage() {
 
         {/* Form sections */}
         <div className="px-3 sm:px-6 py-5 space-y-4 max-w-2xl">
-          <VoiceInput onParsed={handleVoiceParsed} />
+          <PlanGate requiredPlan="pro">
+            <VoiceInput onParsed={handleVoiceParsed} />
+          </PlanGate>
           <HeaderSection invoice={currentInvoice} onChange={onChange} />
           <PartySection invoice={currentInvoice} onChange={onChange} />
           <LineItems invoice={currentInvoice} onChange={onChange} />
