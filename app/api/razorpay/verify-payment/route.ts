@@ -1,16 +1,38 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
+import { z } from "zod";
+import { rateLimit, getClientIdentifier } from "@/lib/rate-limit";
 
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
 
+const schema = z.object({
+  razorpay_order_id: z.string().min(1),
+  razorpay_payment_id: z.string().min(1),
+  razorpay_signature: z.string().min(1),
+});
+
 export async function POST(req: NextRequest) {
   try {
+    // Rate limit: 10 verification attempts per minute per user/IP
+    const identifier = getClientIdentifier(req);
+    const { success } = rateLimit(identifier, 10, 60 * 1000);
+    if (!success) {
+      return NextResponse.json(
+        { error: "Too many verification attempts. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const body = await req.json();
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body as {
-      razorpay_order_id: string;
-      razorpay_payment_id: string;
-      razorpay_signature: string;
-    };
+    const result = schema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json(
+        { error: "Invalid input", details: result.error.issues },
+        { status: 400 }
+      );
+    }
+
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = result.data;
 
     if (!RAZORPAY_KEY_SECRET) {
       return NextResponse.json(

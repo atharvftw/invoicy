@@ -2,29 +2,48 @@ import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { Invoice } from "@/types/invoice";
 import { substituteTemplateVars, buildHtmlEmail } from "@/lib/email";
+import { z } from "zod";
+import { rateLimit, getClientIdentifier } from "@/lib/rate-limit";
+
+const schema = z.object({
+  to: z.string().email(),
+  invoice: z.any(), // Invoice object - complex, validated at runtime
+  subject: z.string().min(1).max(500),
+  body: z.string().min(1).max(10000),
+  fromName: z.string().optional(),
+  smtp: z.object({
+    host: z.string().min(1),
+    port: z.number().int().min(1).max(65535),
+    secure: z.boolean(),
+    user: z.string().min(1),
+    password: z.string().min(1),
+    fromEmail: z.string().email(),
+    fromName: z.string(),
+  }),
+});
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const {
-      to,
-      invoice,
-      subject,
-      body: textBody,
-      fromName,
-      smtp,
-    } = body as {
-      to: string;
-      invoice: Invoice;
-      subject: string;
-      body: string;
-      fromName?: string;
-      smtp: { host: string; port: number; secure: boolean; user: string; password: string; fromEmail: string; fromName: string };
-    };
-
-    if (!to || !invoice || !subject || !textBody || !smtp) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    // Rate limit: 50 emails per hour per user/IP (to prevent spam)
+    const identifier = getClientIdentifier(req);
+    const { success } = rateLimit(identifier, 50, 60 * 60 * 1000);
+    if (!success) {
+      return NextResponse.json(
+        { error: "Too many emails sent. Please try again later." },
+        { status: 429 }
+      );
     }
+
+    const body = await req.json();
+    const result = schema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json(
+        { error: "Invalid input", details: result.error.issues },
+        { status: 400 }
+      );
+    }
+
+    const { to, invoice, subject, body: textBody, fromName, smtp } = result.data;
 
     const from = `${smtp.fromName || fromName || "Invoicy"} <${smtp.fromEmail}>`;
 

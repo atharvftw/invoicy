@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Invoice, EmailTone } from "@/types/invoice";
+import { z } from "zod";
+import { rateLimit, getClientIdentifier } from "@/lib/rate-limit";
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = "gemini-2.0-flash";
@@ -71,23 +73,43 @@ BODY:
 8. Use "{client_name}", "{invoice_number}", "{total}", "{due_date}", "{balance_due}", "{currency}" as template variables where appropriate.`;
 }
 
+const schema = z.object({
+  invoice: z.any(), // Invoice object - complex, validated at runtime
+  tone: z.enum(["professional", "casual", "firm", "friendly", "urgent"]),
+  context: z.object({
+    riskScore: z.number().min(0).max(100).optional(),
+    avgDaysLate: z.number().optional(),
+    isVIP: z.boolean().optional(),
+    daysOverdue: z.number().optional(),
+  }).optional(),
+});
+
 export async function POST(req: NextRequest) {
   try {
+    // Rate limit: 25 requests per minute per user/IP
+    const identifier = getClientIdentifier(req);
+    const { success } = rateLimit(identifier, 25, 60 * 1000);
+    if (!success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     if (!GEMINI_API_KEY) {
       return NextResponse.json({ error: "GEMINI_API_KEY not configured on server" }, { status: 500 });
     }
 
     const body = await req.json();
-    const { invoice, tone, context } = body as {
-      invoice: Invoice;
-      tone: EmailTone;
-      context?: {
-        riskScore?: number;
-        avgDaysLate?: number;
-        isVIP?: boolean;
-        daysOverdue?: number;
-      };
-    };
+    const result = schema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json(
+        { error: "Invalid input", details: result.error.issues },
+        { status: 400 }
+      );
+    }
+
+    const { invoice, tone, context } = result.data;
 
     if (!invoice || !tone) {
       return NextResponse.json({ error: "Missing invoice or tone" }, { status: 400 });

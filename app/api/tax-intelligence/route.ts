@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { rateLimit, getClientIdentifier } from "@/lib/rate-limit";
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = "gemini-2.0-flash";
@@ -29,8 +31,22 @@ RULES:
 - If unsure, default to 18% with medium confidence
 - Output only the JSON object, no markdown, no explanations.`;
 
+const schema = z.object({
+  description: z.string().min(3).max(500),
+});
+
 export async function POST(req: NextRequest) {
   try {
+    // Rate limit: 30 requests per minute per user/IP
+    const identifier = getClientIdentifier(req);
+    const { success } = rateLimit(identifier, 30, 60 * 1000);
+    if (!success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     if (!GEMINI_API_KEY) {
       return NextResponse.json(
         { error: "GEMINI_API_KEY not configured" },
@@ -39,11 +55,15 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { description } = body as { description: string };
-
-    if (!description || typeof description !== "string") {
-      return NextResponse.json({ error: "Missing description" }, { status: 400 });
+    const result = schema.safeParse(body);
+    if (!result.success) {
+      return NextResponse.json(
+        { error: "Invalid input", details: result.error.issues },
+        { status: 400 }
+      );
     }
+
+    const { description } = result.data;
 
     const res = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
