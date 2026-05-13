@@ -3,8 +3,6 @@ import { Resend } from "resend";
 import { substituteTemplateVars, buildHtmlEmail } from "@/lib/email";
 import { Invoice } from "@/types/invoice";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -27,6 +25,7 @@ export async function POST(req: NextRequest) {
     const resolvedText = substituteTemplateVars(textBody, invoice);
     const html = buildHtmlEmail(resolvedSubject, resolvedText, invoice);
 
+    const resend = new Resend(process.env.RESEND_API_KEY);
     const { data, error } = await resend.emails.send({
       from,
       to,
