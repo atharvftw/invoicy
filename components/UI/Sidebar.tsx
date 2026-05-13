@@ -90,10 +90,11 @@ export default function Sidebar() {
 
       {/* Collapsed state — desktop only */}
       {!sidebarOpen && (
-        <div className="hidden lg:flex flex-col items-center py-4 px-2 border-r border-gray-100 bg-white gap-3 shrink-0">
+        <div className="hidden lg:flex flex-col items-center py-4 px-2 border-r border-gray-100 bg-white gap-3 shrink-0" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-subtle)' }}>
           <button
             onClick={toggleSidebar}
             className="p-2 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+            style={{ color: 'var(--text-tertiary)' }}
             title="Show sidebar"
           >
             <PanelLeftOpen size={18} />
@@ -117,6 +118,7 @@ export default function Sidebar() {
                   : "text-gray-400 hover:text-indigo-600 hover:bg-indigo-50",
                 !item.disabled && isActive(item) && "text-indigo-600 bg-indigo-50"
               )}
+              style={item.disabled ? { color: 'var(--text-tertiary)' } : !item.disabled && isActive(item) ? { color: 'var(--accent-primary-hover)', background: 'var(--accent-primary-dim)' } : { color: 'var(--text-tertiary)' }}
             >
               {item.icon}
             </Link>
@@ -131,14 +133,15 @@ export default function Sidebar() {
           <div className="fixed inset-0 bg-black/20 z-40 lg:hidden" onClick={toggleSidebar} />
           <aside
             className="fixed inset-y-0 left-0 z-50 flex flex-col border-r border-gray-100 bg-white shrink-0 lg:static lg:inset-auto lg:z-auto"
-            style={{ width: "var(--sidebar-width)" }}
+            style={{ width: "var(--sidebar-width)", background: 'var(--bg-secondary)', borderColor: 'var(--border-subtle)' }}
           >
             {/* Logo + collapse */}
-            <div className="px-4 pt-4 pb-3 border-b border-gray-50 flex items-center justify-between">
+            <div className="px-4 pt-4 pb-3 border-b border-gray-50 flex items-center justify-between" style={{ borderColor: 'var(--border-subtle)' }}>
               <Logo variant="full" size={28} />
               <button
                 onClick={toggleSidebar}
                 className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                style={{ color: 'var(--text-tertiary)' }}
                 title="Hide sidebar"
               >
                 <PanelLeftClose size={15} />
@@ -160,7 +163,7 @@ export default function Sidebar() {
 
             {/* Navigation */}
             <nav className="flex-1 px-3 pt-2 space-y-0.5 overflow-y-auto">
-              <p className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-gray-400">
+              <p className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-gray-400" style={{ color: 'var(--text-tertiary)' }}>
                 Workspace
               </p>
               {WORKSPACE_ITEMS.map((item) => (
@@ -168,7 +171,7 @@ export default function Sidebar() {
               ))}
 
               <div className="pt-4">
-                <p className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-gray-400">
+                <p className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-gray-400" style={{ color: 'var(--text-tertiary)' }}>
                   Configuration
                 </p>
                 {CONFIG_ITEMS.map((item) =>
@@ -190,30 +193,31 @@ export default function Sidebar() {
                 )}
 
                 {settingsOpen && (
-                  <div className="mx-1 mb-1 mt-0.5 rounded-lg border border-gray-100 bg-gray-50 p-2.5 overflow-hidden space-y-2">
+                  <div className="mx-1 mb-1 mt-0.5 rounded-lg border border-gray-100 bg-gray-50 p-2.5 overflow-hidden space-y-2" style={{ background: 'var(--bg-tertiary)', borderColor: 'var(--border-subtle)' }}>
                     <Link
                       href="/onboarding"
                       className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-white transition-colors"
+                      style={{ color: 'var(--text-secondary)' }}
                       onClick={() => setSettingsOpen(false)}
                     >
                       <Sparkles size={13} className="text-amber-500 shrink-0" />
-                      <span className="text-[11px] font-medium text-gray-700">Setup Assistant</span>
+                      <span className="text-[11px] font-medium text-gray-700" style={{ color: 'var(--text-secondary)' }}>Setup Assistant</span>
                     </Link>
                     {isPremium ? (
                       <div className="flex items-center gap-2 px-2 py-1.5">
                         <Crown size={13} className="text-indigo-500 shrink-0" />
                         <div className="min-w-0">
-                          <p className="text-[11px] font-semibold text-gray-800">Premium active</p>
-                          <p className="text-[10px] text-gray-400 truncate">Watermark removed · All themes</p>
+                          <p className="text-[11px] font-semibold text-gray-800" style={{ color: 'var(--text-primary)' }}>Premium active</p>
+                          <p className="text-[10px] text-gray-400 truncate" style={{ color: 'var(--text-tertiary)' }}>Watermark removed · All themes</p>
                         </div>
                       </div>
                     ) : (
                       <div className="space-y-2 px-2 py-1.5">
                         <div className="flex items-center gap-1.5">
                           <Crown size={12} className="text-indigo-400 shrink-0" />
-                          <p className="text-[11px] font-semibold text-gray-700">Unlock Premium</p>
+                          <p className="text-[11px] font-semibold text-gray-700" style={{ color: 'var(--text-secondary)' }}>Unlock Premium</p>
                         </div>
-                        <ul className="text-[10px] text-gray-500 space-y-0.5 pl-0.5">
+                        <ul className="text-[10px] text-gray-500 space-y-0.5 pl-0.5" style={{ color: 'var(--text-tertiary)' }}>
                           <li>· Remove PDF watermark</li>
                           <li>· All 5 invoice themes</li>
                         </ul>
@@ -225,8 +229,8 @@ export default function Sidebar() {
               </div>
             </nav>
 
-            <div className="px-4 pb-4 pt-3 border-t border-gray-50 flex items-center justify-between">
-              <div className="text-[10px] text-gray-400">v1.0 · Invoicy</div>
+            <div className="px-4 pb-4 pt-3 border-t border-gray-50 flex items-center justify-between" style={{ borderColor: 'var(--border-subtle)' }}>
+              <div className="text-[10px] text-gray-400" style={{ color: 'var(--text-tertiary)' }}>v1.0 · Invoicy</div>
               <Show when="signed-in">
                 <div className={cn("inline-flex items-center justify-center w-7 h-7 rounded-full", isPremium && "ring-2 ring-indigo-500 ring-offset-1")}>
                   <UserButton />
