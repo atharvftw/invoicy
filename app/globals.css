@@ -8,33 +8,6 @@
   --font-geist: 'DM Sans', system-ui, sans-serif;
   --font-mono: 'DM Mono', monospace;
   --sidebar-width: 220px;
-
-  /* Neo-Bento Dark Theme Tokens */
-  --bg-primary: #0A0A0B;
-  --bg-secondary: #111113;
-  --bg-tertiary: #18181B;
-  --bg-card: #141416;
-  --bg-elevated: #1C1C1F;
-
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.10);
-  --border-strong: rgba(255, 255, 255, 0.15);
-
-  --text-primary: #F4F4F5;
-  --text-secondary: #A1A1AA;
-  --text-tertiary: #71717A;
-  --text-muted: #52525B;
-
-  --accent-primary: #6366F1;
-  --accent-primary-hover: #818CF8;
-  --accent-primary-dim: rgba(99, 102, 241, 0.15);
-
-  --success: #22C55E;
-  --success-dim: rgba(34, 197, 94, 0.15);
-  --warning: #F59E0B;
-  --warning-dim: rgba(245, 158, 11, 0.15);
-  --error: #EF4444;
-  --error-dim: rgba(239, 68, 68, 0.15);
 }
 
 * {
@@ -54,8 +27,8 @@ input[type="number"] {
 html, body {
   height: 100%;
   font-family: var(--font-geist);
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  background: #f8f7f5;
+  color: #1a1a2e;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -63,12 +36,12 @@ html, body {
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
 
 /* Focus ring */
 *:focus-visible {
-  outline: 2px solid var(--accent-primary);
+  outline: 2px solid #4f46e5;
   outline-offset: 2px;
 }
 
@@ -78,27 +51,16 @@ html, body {
     transition-all duration-150
     placeholder:text-gray-400
     focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400;
-  background: var(--bg-tertiary);
-  border-color: var(--border-default);
-  color: var(--text-primary);
-}
-.input-base::placeholder {
-  color: var(--text-muted);
-}
-.input-base:focus {
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 2px var(--accent-primary-dim);
 }
 
 .label-base {
   @apply block text-xs font-medium text-gray-500 mb-1.5;
-  color: var(--text-secondary);
 }
 
 /* Paper effect for invoice preview */
 .paper {
-  background: var(--bg-card);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.4), 0 24px 48px rgba(0,0,0,0.3);
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.08), 0 24px 48px rgba(0,0,0,0.06);
 }
 
 /* Grain texture overlay */
@@ -119,15 +81,10 @@ html, body {
   @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
     text-gray-600 transition-all duration-150
     hover:bg-indigo-50 hover:text-indigo-700;
-  color: var(--text-secondary);
 }
-.sidebar-link:hover {
-  background: var(--accent-primary-dim);
-  color: var(--accent-primary-hover);
-}
+
 .sidebar-link.active {
-  background: var(--accent-primary-dim);
-  color: var(--accent-primary-hover);
+  @apply bg-indigo-50 text-indigo-700;
 }
 
 /* Status badges */
@@ -138,8 +95,6 @@ html, body {
 /* Section card */
 .section-card {
   @apply bg-white rounded-xl border border-gray-100 p-5 shadow-card;
-  background: var(--bg-card);
-  border-color: var(--border-subtle);
 }
 
 /* Animate in */
@@ -155,7 +110,6 @@ html, body {
 /* Line items table */
 .items-table th {
   @apply text-xs font-medium text-gray-400 uppercase tracking-wide pb-2;
-  color: var(--text-tertiary);
 }
 
 .items-table td {
